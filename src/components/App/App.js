@@ -60,6 +60,11 @@ class App extends Component {
     super(props);
 
     this.state = initialState;
+    this.appRef = React.createRef();
+  }
+
+  getAppRef = () => {
+    return this.appRef;
   }
 
   resetState = (callback) => {
@@ -271,10 +276,11 @@ class App extends Component {
           {!ready && <LaunchScreen />}
 
           {ready && (
-            <>
+            <div ref={this.appRef} id='appContainer'>
               <Router
                 user={user}
                 roles={roles}
+                getAppRef={this.getAppRef}
                 bar={
                   <Bar
                     performingAction={performingAction}
@@ -400,7 +406,7 @@ class App extends Component {
                 open={snackbar.open}
                 onClose={this.closeSnackbar}
               />
-            </>
+            </div>
           )}
         </ErrorBoundary>
       </MuiThemeProvider>
@@ -486,16 +492,6 @@ class App extends Component {
         });
       }
     );
-  }
-
-  componentWillUnmount() {
-    if (this.onAuthStateChangedObserver) {
-      this.onAuthStateChangedObserver();
-    }
-
-    if (this.userDocumentSnapshotListener) {
-      this.userDocumentSnapshotListener();
-    }
   }
 }
 

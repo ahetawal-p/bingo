@@ -114,7 +114,11 @@ class Bar extends Component {
                   </Button>
                 </Box>
               )}
-
+              <Box>
+                <Typography color="inherit" variant="h6">
+                  {`Welcome ${user.email} !`}
+                </Typography>
+              </Box>
               <IconButton
                 color="inherit"
                 disabled={performingAction}

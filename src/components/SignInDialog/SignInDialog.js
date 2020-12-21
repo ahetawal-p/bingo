@@ -180,41 +180,39 @@ class SignInDialog extends Component {
           performingAction: true,
           errors: null,
         },
-        () => {
-          authentication
-            .signIn(emailAddress, password)
-            .then((user) => {
-              this.props.dialogProps.onClose(() => {
-                const displayName = user.displayName;
-                const emailAddress = user.email;
+        async () => {
+          try {
+            const user = await authentication.signIn(emailAddress, password)
 
-                this.props.openSnackbar(
-                  `Signed in as ${displayName || emailAddress}`
-                );
-              });
-            })
-            .catch((reason) => {
-              const code = reason.code;
-              const message = reason.message;
+            this.props.dialogProps.onClose(() => {
+              const displayName = user.displayName;
+              const emailAddress = user.email;
 
-              switch (code) {
-                case "auth/invalid-email":
-                case "auth/user-disabled":
-                case "auth/user-not-found":
-                case "auth/wrong-password":
-                  this.props.openSnackbar(message);
-                  return;
-
-                default:
-                  this.props.openSnackbar(message);
-                  return;
-              }
-            })
-            .finally(() => {
-              this.setState({
-                performingAction: false,
-              });
+              this.props.openSnackbar(
+                `Signed in as ${displayName || emailAddress}`
+              );
             });
+          } catch (reason) {
+            const code = reason.code;
+            const message = reason.message;
+            this.setState({
+              performingAction: false,
+            });
+            switch (code) {
+              case "auth/invalid-email":
+              case "auth/user-disabled":
+              case "auth/user-not-found":
+              case "auth/wrong-password":
+                this.props.openSnackbar(message);
+                return;
+
+              default:
+                this.props.openSnackbar(message);
+
+                return;
+            }
+
+          }
         }
       );
     }

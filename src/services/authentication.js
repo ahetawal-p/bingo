@@ -78,128 +78,50 @@ authentication.signUp = (fields) => {
   });
 };
 
-authentication.signUpWithEmailAddressAndPassword = (emailAddress, password) => {
-  return new Promise((resolve, reject) => {
-    if (!emailAddress || !password) {
-      reject(new Error("No e-mail address or password"));
+authentication.signUpWithEmailAddressAndPassword = async (emailAddress, password) => {
+  if (!emailAddress || !password) {
+    throw new Error("No e-mail address or password");
+  }
+  if (auth.currentUser) {
+    throw new Error("No current user");
+  }
 
-      return;
-    }
+  const value = await auth.createUserWithEmailAndPassword(emailAddress, password);
+  const user = value.user
+  if (!user) {
+    throw new Error("No user created ");
+  }
+  const uid = user.uid
+  const userDocumentReference = firestore.collection("users").doc(uid);
+  await userDocumentReference.set({}, { merge: true })
 
-    if (auth.currentUser) {
-      reject(new Error("No current user"));
+  await user.sendEmailVerification()
 
-      return;
-    }
-
-    auth
-      .createUserWithEmailAndPassword(emailAddress, password)
-      .then((value) => {
-        const user = value.user;
-
-        if (!user) {
-          reject(new Error("No user"));
-
-          return;
-        }
-
-        const uid = user.uid;
-
-        if (!uid) {
-          reject(new Error("No UID"));
-
-          return;
-        }
-
-        const userDocumentReference = firestore.collection("users").doc(uid);
-
-        userDocumentReference
-          .set({}, { merge: true })
-          .then((value) => {
-            analytics.logEvent("sign_up", {
-              method: "password",
-            });
-
-            resolve(value);
-          })
-          .catch((reason) => {
-            reject(reason);
-          });
-      })
-      .catch((reason) => {
-        reject(reason);
-      });
-  });
 };
 
-authentication.signIn = (emailAddress, password) => {
-  return new Promise((resolve, reject) => {
-    if (!emailAddress || !password) {
-      reject(new Error("No e-mail address or password"));
+authentication.signIn = async (emailAddress, password) => {
+  if (!emailAddress || !password) {
+    throw new Error("No e-mail address or password");
+  }
+  if (auth.currentUser) {
+    throw new Error("No current user");
+  }
 
-      return;
-    }
-
-    if (auth.currentUser) {
-      reject(new Error("No current user"));
-
-      return;
-    }
-
-    auth
-      .signInWithEmailAndPassword(emailAddress, password)
-      .then((value) => {
-        const user = value.user;
-
-        if (!user) {
-          reject(new Error("No user"));
-
-          return;
-        }
-
-        const uid = user.uid;
-
-        if (!uid) {
-          reject(new Error("No UID"));
-
-          return;
-        }
-
-        const userDocumentReference = firestore.collection("users").doc(uid);
-
-        userDocumentReference
-          .get({ source: "server" })
-          .then((value) => {
-            if (value.exists) {
-              analytics.logEvent("login", {
-                method: "password",
-              });
-
-              resolve(user);
-            } else {
-              userDocumentReference
-                .set({}, { merge: true })
-                .then((value) => {
-                  analytics.logEvent("login", {
-                    method: "password",
-                  });
-
-                  resolve(user);
-                })
-                .catch((reason) => {
-                  reject(reason);
-                });
-            }
-          })
-          .catch((reason) => {
-            reject(reason);
-          });
-      })
-      .catch((reason) => {
-        reject(reason);
-      });
-  });
+  const value = await auth.signInWithEmailAndPassword(emailAddress, password);
+  const user = value.user
+  if (!user) {
+    throw new Error("No user created ");
+  }
+  const uid = user.uid
+  const userDocumentReference = firestore.collection("users").doc(uid);
+  const userFromDB = await userDocumentReference.get({ source: "server" })
+  if (!userFromDB.exists) {
+    await userDocumentReference.set({}, { merge: true })
+  }
+  return user
 };
+
+
 
 authentication.sendSignInLinkToEmail = (emailAddress) => {
   return new Promise((resolve, reject) => {

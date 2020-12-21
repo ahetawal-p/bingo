@@ -28,6 +28,8 @@ import AuthProviderList from "../AuthProviderList";
 import constraints from "../../data/constraints";
 import authentication from "../../services/authentication";
 
+// validate.validators.email.PATTERN = /^((?!\.)[\w-_.]*[^.])(@salesforce\.com)$/
+
 const styles = (theme) => ({
   closeButton: {
     position: "absolute",
@@ -97,34 +99,31 @@ class SignUpDialog extends Component {
           performingAction: true,
           errors: null,
         },
-        () => {
-          authentication
-            .signUpWithEmailAddressAndPassword(emailAddress, password)
-            .then((value) => {
-              this.props.dialogProps.onClose();
-            })
-            .catch((reason) => {
-              const code = reason.code;
-              const message = reason.message;
+        async () => {
+          try {
+            await authentication.signUpWithEmailAddressAndPassword(emailAddress, password)
 
-              switch (code) {
-                case "auth/email-already-in-use":
-                case "auth/invalid-email":
-                case "auth/operation-not-allowed":
-                case "auth/weak-password":
-                  this.props.openSnackbar(message);
-                  return;
+            this.props.dialogProps.onClose();
 
-                default:
-                  this.props.openSnackbar(message);
-                  return;
-              }
-            })
-            .finally(() => {
-              this.setState({
-                performingAction: false,
-              });
+          } catch (reason) {
+            const code = reason.code;
+            const message = reason.message;
+            this.setState({
+              performingAction: false,
             });
+            switch (code) {
+              case "auth/email-already-in-use":
+              case "auth/invalid-email":
+              case "auth/operation-not-allowed":
+              case "auth/weak-password":
+                this.props.openSnackbar(message);
+                return;
+
+              default:
+                this.props.openSnackbar(message);
+                return;
+            }
+          }
         }
       );
     }
