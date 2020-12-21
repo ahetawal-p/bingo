@@ -78,7 +78,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     }, [state.readOnly, image, takeScreenshot, getAppRef])
 
     useEffect(() => {
-        fetchBoardData(false, user, openSnackbar)
+        fetchBoardData(true, user, openSnackbar)
     }, [openSnackbar, user]);
 
     const isWon = checked => {
