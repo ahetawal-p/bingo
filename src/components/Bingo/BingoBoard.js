@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
@@ -11,9 +10,8 @@ import useWindowSize from 'react-use/lib/useWindowSize'
 import Confetti from 'react-confetti'
 import { useScreenshot } from 'use-react-screenshot'
 import hekaBackend from '../../services/hekaBackend'
-
-
-const wait = ms => new Promise(r => setTimeout(r, ms));
+import SlackShare from './SlackShare'
+import util from '../../services/util'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -29,6 +27,8 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const [state, setState] = useState({ checked: {}, readOnly: false });
     const [currentChange, setCurrentChange] = useState("");
     const [ready, setReady] = useState(false);
+    const [startScreenshot, setStartScreenshot] = useState(false);
+    const [openSlackShare, setSlackShare] = useState(false);
     const [dbInfo, setDbInfo] = useState({
         currentBoardId: null,
         userBoardItems: [],
@@ -38,6 +38,10 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const { width, height } = useWindowSize()
     const [image, takeScreenshot] = useScreenshot()
 
+    const onCloseCallback = () => {
+        console.log("Closing now")
+        setSlackShare(false)
+    }
     const fetchBoardData = async (isMockData, user, openSnackbarCallback) => {
         try {
             let userBoardData = {}
@@ -68,14 +72,20 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         }
     }
     useEffect(() => {
+        if (image) {
+            console.log("I got image")
+            setSlackShare(true)
+        }
+    }, [image])
+
+    useEffect(() => {
         const getImage = () => takeScreenshot(getAppRef().current)
-        if (state.readOnly === true && !image) {
+        if (startScreenshot === true) {
+            console.log("I getting image")
             getImage()
         }
-        if (image) {
-            console.log(image)
-        }
-    }, [state.readOnly, image, takeScreenshot, getAppRef])
+    }, [startScreenshot, takeScreenshot, getAppRef])
+
 
     useEffect(() => {
         fetchBoardData(true, user, openSnackbar)
@@ -99,7 +109,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
             return
         }
         setCurrentChange(id)
-        await wait(50)
+        await util.wait(50)
         setCurrentChange("")
         setState(state => {
             const checked = { ...state.checked, [id]: !state.checked[id] };
@@ -115,6 +125,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
 
     return (
         <div className={classes.root}>
+
             {!ready && <LaunchScreen />}
             {state.won ? <Confetti
                 width={width}
@@ -131,10 +142,18 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                             readOnly: true
                         };
                     });
+                    setStartScreenshot(true)
                 }}
             /> : null}
             {ready && (
                 <>
+                    <SlackShare open={openSlackShare}
+                        user={user}
+                        boardTitle={'Stay Healthy'}
+                        image={image}
+                        openSnackbar={openSnackbar}
+                        onClose={onCloseCallback} />
+
                     <Box mx="auto" bgcolor="background.paper" p={1} m={1}>
                         <Typography variant="body1">"Hello There"</Typography>
                     </Box>
