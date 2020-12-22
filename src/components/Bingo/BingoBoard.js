@@ -21,9 +21,11 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column'
     }
 }));
-
+const isMockData = false
 export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const classes = useStyles();
+    const { boardData, winnerInfo } = hekaBackend.useBoardData(user, isMockData)
+
     const [state, setState] = useState({ checked: {}, readOnly: false });
     const [currentChange, setCurrentChange] = useState("");
     const [ready, setReady] = useState(false);
@@ -33,7 +35,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         currentBoardId: null,
         userBoardItems: [],
         userBoardItemStatus: [],
-        isCompleted: false
+        isUserCompleted: false
     });
     const { width, height } = useWindowSize()
     const [image, takeScreenshot] = useScreenshot()
@@ -41,35 +43,6 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const onCloseCallback = () => {
         console.log("Closing now")
         setSlackShare(false)
-    }
-    const fetchBoardData = async (isMockData, user, openSnackbarCallback) => {
-        try {
-            let userBoardData = {}
-            if (isMockData) {
-                console.log("Using mock data")
-                userBoardData = hekaBackend.mockData()
-            } else {
-                console.log("Using real data")
-                userBoardData = await hekaBackend.fetchCurrentUserBoard(user)
-            }
-            if (userBoardData.boardId) {
-                console.log("Setting db info now")
-                setDbInfo(state => ({
-                    ...state,
-                    currentBoardId: userBoardData.boardId,
-                    userBoardItems: userBoardData.actionSequence,
-                    userBoardItemStatus: userBoardData.actionStatus,
-                    isCompleted: userBoardData.isBoardCompleted
-                }))
-                setReady(true)
-            } else {
-                console.error("Something went wrong")
-                openSnackbarCallback("Something went wrong")
-            }
-        } catch (e) {
-            console.error(e)
-            openSnackbarCallback(e.message)
-        }
     }
     useEffect(() => {
         if (image) {
@@ -86,10 +59,31 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         }
     }, [startScreenshot, takeScreenshot, getAppRef, image])
 
+    useEffect(() => {
+        console.log("i am changing here")
+        console.log(boardData)
+        setReady(boardData.isReady)
+        if (boardData.error) {
+            openSnackbar(boardData.error)
+        } else if (boardData.isReady) {
+            setDbInfo(state => ({
+                ...state,
+                currentBoardId: boardData.currentBoardId,
+                userBoardItems: boardData.userBoardItems,
+                userBoardItemStatus: boardData.userBoardItemStatus,
+                isUserCompleted: boardData.isUserCompleted
+            }))
+        }
+
+    }, [boardData, openSnackbar]);
 
     useEffect(() => {
-        fetchBoardData(true, user, openSnackbar)
-    }, [openSnackbar, user]);
+        console.log("i am winner info")
+        console.log(winnerInfo)
+        if (winnerInfo.isWon) {
+            openSnackbar("Sorry you lost")
+        }
+    }, [winnerInfo, openSnackbar])
 
     const isWon = checked => {
         const range = [0, 1, 2, 3];

@@ -23,6 +23,7 @@
     "react-card-flip": "^1.0.11",
     "react-confetti": "^6.0.0",
     "react-dom": "^16.14.0",
+    "react-firebase-hooks": "^2.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.1",
     "react-swipeable-views": "^0.13.9",
