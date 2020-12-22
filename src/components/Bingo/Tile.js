@@ -11,9 +11,14 @@ const useStyles = makeStyles((theme) => ({
         border: "2px saddlebrown dashed",
         borderRadius: "8px",
         cursor: "pointer",
+        [theme.breakpoints.down('sm')]: {
+            height: '120px',
+        },
+        [theme.breakpoints.up('sm')]: {
+            height: '100px',
+        },
         display: 'flex',
         width: '100%',
-        height: '100%',
         boxShadow: 'none',
         justifyContent: 'center',
         textAlign: 'center',
@@ -39,7 +44,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
             height: '100%',
         }}>
             <Card onClick={onToggle} className={classes.tile}>
-                <CardContent>
+                <CardContent style={{ padding: '4px' }}>
                     {isChanging && <CircularProgress size={16} />}
                     {!isChanging && (
                         <>
@@ -51,7 +56,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
                 </CardContent>
             </Card>
             <Card className={completedStyle}>
-                <CardContent>
+                <CardContent style={{ padding: '4px' }}>
                     <Typography color="textSecondary">
                         {children}
                     </Typography>
