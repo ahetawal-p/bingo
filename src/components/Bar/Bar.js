@@ -114,8 +114,8 @@ class Bar extends Component {
                   </Button>
                 </Box>
               )}
-              <Box>
-                <Typography color="inherit" variant="h6">
+              <Box >
+                <Typography color="inherit" variant="body2" noWrap={true} align={'right'}>
                   {`Welcome ${user.email} !`}
                 </Typography>
               </Box>

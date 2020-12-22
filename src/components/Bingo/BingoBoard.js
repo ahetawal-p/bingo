@@ -80,11 +80,11 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
 
     useEffect(() => {
         const getImage = () => takeScreenshot(getAppRef().current)
-        if (startScreenshot === true) {
+        if (startScreenshot === true && !image) {
             console.log("I getting image")
             getImage()
         }
-    }, [startScreenshot, takeScreenshot, getAppRef])
+    }, [startScreenshot, takeScreenshot, getAppRef, image])
 
 
     useEffect(() => {
