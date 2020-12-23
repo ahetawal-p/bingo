@@ -1,7 +1,7 @@
 import { firestore } from "../firebase";
 import { useState, useEffect } from 'react';
 import shuffle from "shuffle-array";
-import { useCollection, useDocumentOnce } from 'react-firebase-hooks/firestore';
+import { useCollection, useDocumentOnce, useCollectionData } from 'react-firebase-hooks/firestore';
 
 
 const hekaBackend = {};
@@ -152,6 +152,19 @@ hekaBackend.mockData = () => {
 
     }
     return userBoard
+}
+
+hekaBackend.getAdminBoards = function useAdminBoardsData(isMockData) {
+    const [origBoards = [], loading, error] = useCollectionData(!isMockData ?
+        firestore.collection("boards")
+        : null, {
+        snapshotListenOptions: { includeMetadataChanges: true },
+    })
+    const allBoards = origBoards.map(item => {
+        return { ...item, createdOn: item.createdOn.seconds, modifiedOn: item.createdOn.seconds, wonAt: item.wonAt.seconds }
+    })
+    console.log(allBoards)
+    return { allBoards, loading, error }
 }
 
 export default hekaBackend;

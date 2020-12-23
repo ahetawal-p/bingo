@@ -84,6 +84,13 @@ class Bar extends Component {
       },
     ];
 
+    if (user && roles.includes("admin")) {
+      menuItems.splice(1, 0, {
+        name: "Admin",
+        to: '/admin',
+      });
+
+    }
     return (
       <AppBar color="primary" position="static">
         <Toolbar>
@@ -102,21 +109,9 @@ class Bar extends Component {
 
           {user && (
             <>
-              {roles.includes("admin") && (
-                <Box mr={1}>
-                  <Button
-                    color="inherit"
-                    component={RouterLink}
-                    to="/admin"
-                    variant="outlined"
-                  >
-                    Admin
-                  </Button>
-                </Box>
-              )}
               <Box >
                 <Typography color="inherit" variant="body2" noWrap={true} align={'right'}>
-                  {`Welcome ${user.email} !`}
+                  {`${roles.includes("admin") ? "*" : ''} Welcome ${user.email} !`}
                 </Typography>
               </Box>
               <IconButton

@@ -28,7 +28,7 @@ class Router extends Component {
 
           <Route path="/admin">
             {user && roles.includes("admin") ? (
-              <AdminPage />
+              <AdminPage openSnackbar={openSnackbar} user={user} />
             ) : (
                 <Redirect to="/" />
               )}

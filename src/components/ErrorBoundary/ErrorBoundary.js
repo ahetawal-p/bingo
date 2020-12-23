@@ -2,8 +2,6 @@ import React, { Component } from "react";
 
 import PropTypes from "prop-types";
 
-import * as Sentry from "@sentry/browser";
-
 import EmptyState from "../EmptyState";
 
 import { ReactComponent as ErrorIllustration } from "../../illustrations/error.svg";
@@ -23,15 +21,15 @@ class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    Sentry.withScope((scope) => {
-      scope.setExtras(errorInfo);
+    // Sentry.withScope((scope) => {
+    //   scope.setExtras(errorInfo);
 
-      const eventId = Sentry.captureException(error);
+    //   const eventId = Sentry.captureException(error);
 
-      this.setState({
-        eventId: eventId,
-      });
-    });
+    //   this.setState({
+    //     eventId: eventId,
+    //   });
+    // });
   }
 
   render() {
