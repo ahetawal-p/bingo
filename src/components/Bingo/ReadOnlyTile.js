@@ -10,7 +10,12 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: "8px",
         display: 'flex',
         width: '100%',
-        height: '100%',
+        [theme.breakpoints.down('sm')]: {
+            height: '120px',
+        },
+        [theme.breakpoints.up('sm')]: {
+            height: '100px',
+        },
         boxShadow: 'none',
         justifyContent: 'center',
         textAlign: 'center',

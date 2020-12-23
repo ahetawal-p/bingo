@@ -12,6 +12,16 @@ import { useScreenshot } from 'use-react-screenshot'
 import hekaBackend from '../../services/hekaBackend'
 import SlackShare from './SlackShare'
 import util from '../../services/util'
+import GameLostDialog from './GameLostDialog';
+
+// TODO add empty state when no current board present
+// Add calls to update every cell click
+// Add transaction call for winner updates and error handling
+// Fix sign up and sign in UX
+// Fix theme match to TH may be ?
+// Add Admin view and create board logic 
+// Remove unused views
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -26,13 +36,15 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const classes = useStyles();
     const { boardData, winnerInfo } = hekaBackend.useBoardData(user, isMockData)
 
-    const [state, setState] = useState({ checked: {}, readOnly: false });
+    const [state, setState] = useState({ checked: {}, readOnly: false, readOnlyMessage: null });
     const [currentChange, setCurrentChange] = useState("");
     const [ready, setReady] = useState(false);
     const [startScreenshot, setStartScreenshot] = useState(false);
     const [openSlackShare, setSlackShare] = useState(false);
+    const [openGameLost, setOpenGameLost] = useState(false);
     const [dbInfo, setDbInfo] = useState({
         currentBoardId: null,
+        currentBoardTitle: null,
         userBoardItems: [],
         userBoardItemStatus: [],
         isUserCompleted: false
@@ -44,6 +56,12 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         console.log("Closing now")
         setSlackShare(false)
     }
+
+    const onCloseGameLostCallback = () => {
+        console.log("Closing now")
+        setOpenGameLost(false)
+    }
+
     useEffect(() => {
         if (image) {
             console.log("I got image")
@@ -71,7 +89,8 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                 currentBoardId: boardData.currentBoardId,
                 userBoardItems: boardData.userBoardItems,
                 userBoardItemStatus: boardData.userBoardItemStatus,
-                isUserCompleted: boardData.isUserCompleted
+                isUserCompleted: boardData.isUserCompleted,
+                currentBoardTitle: boardData.currentBoardTitle
             }))
         }
 
@@ -80,10 +99,17 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     useEffect(() => {
         console.log("i am winner info")
         console.log(winnerInfo)
-        if (winnerInfo.isWon) {
-            openSnackbar("Sorry you lost")
+        if (winnerInfo.isWon && winnerInfo.id !== user.uid) {
+            setOpenGameLost(true)
+            setState(state => {
+                return {
+                    ...state,
+                    readOnly: true,
+                    readOnlyMessage: "Game over"
+                };
+            });
         }
-    }, [winnerInfo, openSnackbar])
+    }, [winnerInfo, openSnackbar, user.uid])
 
     const isWon = checked => {
         const range = [0, 1, 2, 3];
@@ -119,7 +145,6 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
 
     return (
         <div className={classes.root}>
-
             {!ready && <LaunchScreen />}
             {state.won ? <Confetti
                 width={width}
@@ -133,7 +158,8 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                         return {
                             ...state,
                             won: false,
-                            readOnly: true
+                            readOnly: true,
+                            readOnlyMessage: "Congrats you nailed it !"
                         };
                     });
                     setStartScreenshot(true)
@@ -141,20 +167,28 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
             /> : null}
             {ready && (
                 <>
-                    <SlackShare open={openSlackShare}
+                    <SlackShare
+                        open={openSlackShare}
                         user={user}
                         boardTitle={'Stay Healthy'}
                         image={image}
                         openSnackbar={openSnackbar}
                         onClose={onCloseCallback} />
 
-                    <Box mx="auto" bgcolor="background.paper" p={1} m={1}>
-                        <Typography variant="body1">"Hello There"</Typography>
+                    <GameLostDialog
+                        open={openGameLost}
+                        handleClose={onCloseGameLostCallback}
+                        winnerName={winnerInfo.winnerName}
+                    />
+
+                    <Box mx="auto" p={1} m={1}>
+                        <Typography variant="h5">{dbInfo.currentBoardTitle}</Typography>
+                        <Typography variant="body2" align="center">{state.readOnlyMessage}</Typography>
                     </Box>
                     <Grid container spacing={1}>
                         {Object.keys(dbInfo.userBoardItems).map(id => {
                             return <Grid item xs={3} key={id} style={{ display: 'flex' }}>
-                                {state.readOnly ?
+                                {state.readOnly || dbInfo.isUserCompleted ?
                                     <ReadOnlyTile
                                         id={id}
                                         isSet={!!state.checked[id]}

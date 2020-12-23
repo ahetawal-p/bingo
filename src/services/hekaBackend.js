@@ -9,6 +9,7 @@ const hekaBackend = {};
 hekaBackend.useBoardData = function useBoardData(user, isMockData) {
     const [boardData, setDbInfo] = useState({
         currentBoardId: null,
+        currentBoardTitle: null,
         userBoardItems: [],
         userBoardItemStatus: [],
         isUserCompleted: false,
@@ -59,6 +60,7 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             const currentDocData = currentDocRef.data()
             const docId = currentDocRef.id
             const activeItems = currentDocData.items
+            const title = currentDocData.title
             const isWon = currentDocData.isWon
             if (isWon) {
                 setWinnerInfo({
@@ -93,6 +95,7 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
                 {}
             );
             setDbInfo({
+                currentBoardTitle: title,
                 currentBoardId: docId,
                 userBoardItems: updatedSequenceData,
                 userBoardItemStatus: actionStatus,
@@ -140,6 +143,7 @@ hekaBackend.mockData = () => {
     );
     const userBoard = {
         currentBoardId: "board1",
+        currentBoardTitle: "Mock Data title",
         isCompleted: false,
         userBoardItems: tempData,
         userBoardItemStatus: new Array(16).fill(false),
