@@ -23,8 +23,9 @@ function AdminPage({ user, openSnackbar }) {
 
   }
 
-  const editEntry = () => {
-
+  const editEntry = async () => {
+    alert('Not implemented');
+    throw new Error("not ")
   }
 
   useEffect(() => {

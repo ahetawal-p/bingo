@@ -35,7 +35,7 @@ gridData.allColumns = [
         cellStyle: {
             width: 250,
             minWidth: 250,
-            padding: 4
+            padding: 8
         },
         headerStyle: {
             width: 250,
@@ -68,7 +68,7 @@ gridData.allColumns = [
             width: 250,
             minWidth: 250,
             textAlign: 'center',
-            padding: 4
+            padding: 8
         },
         headerStyle: {
             width: 250,
@@ -90,7 +90,7 @@ gridData.allColumns = [
 
         ),
         render: rowData => {
-            const data = rowData[editableFields[1]].join("\n")
+            const data = rowData[editableFields[1]]
             return (<div style={{ width: '100%', whiteSpace: 'pre-wrap', textAlign: 'left' }} >
                 { data}
             </div >)
@@ -102,7 +102,7 @@ gridData.allColumns = [
         field: readableFields[0], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return new Date(rowData[readableFields[0]] * 1000).toLocaleString()
+            return rowData ? new Date(rowData[readableFields[0]] * 1000).toLocaleString() : ""
         }
     },
     {
@@ -120,7 +120,7 @@ gridData.allColumns = [
         field: readableFields[3], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return new Date(rowData[readableFields[3]] * 1000).toLocaleString()
+            return rowData ? new Date(rowData[readableFields[3]] * 1000).toLocaleString() : ""
         }
 
     },
@@ -129,7 +129,7 @@ gridData.allColumns = [
         field: readableFields[4], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return new Date(rowData[readableFields[4]] * 1000).toLocaleString()
+            return rowData ? new Date(rowData[readableFields[4]] * 1000).toLocaleString() : ""
         }
     },
 ]

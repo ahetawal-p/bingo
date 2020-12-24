@@ -161,7 +161,13 @@ hekaBackend.getAdminBoards = function useAdminBoardsData(isMockData) {
         snapshotListenOptions: { includeMetadataChanges: true },
     })
     const allBoards = origBoards.map(item => {
-        return { ...item, createdOn: item.createdOn.seconds, modifiedOn: item.createdOn.seconds, wonAt: item.wonAt.seconds }
+        return {
+            ...item,
+            createdOn: item.createdOn.seconds,
+            modifiedOn: item.createdOn.seconds,
+            wonAt: item.wonAt.seconds,
+            items: item.items.join("\n")
+        }
     })
     console.log(allBoards)
     return { allBoards, loading, error }
