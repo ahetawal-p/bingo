@@ -1,7 +1,7 @@
-import { firestore } from "../firebase";
+import firebase, { firestore } from "../firebase";
 import { useState, useEffect } from 'react';
 import shuffle from "shuffle-array";
-import { useCollection, useDocumentOnce, useCollectionData } from 'react-firebase-hooks/firestore';
+import { useCollection, useDocumentOnce } from 'react-firebase-hooks/firestore';
 
 
 const hekaBackend = {};
@@ -48,7 +48,7 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
                 isBoardCompleted,
                 actionSequence,
                 actionStatus
-            })
+            }, { merge: true })
         }
         if (isMockData) {
             const mockData = this.mockData()
@@ -155,22 +155,53 @@ hekaBackend.mockData = () => {
 }
 
 hekaBackend.getAdminBoards = function useAdminBoardsData(isMockData) {
-    const [origBoards = [], loading, error] = useCollectionData(!isMockData ?
+    const [origBoards = { docs: [] }, loading, error] = useCollection(!isMockData ?
         firestore.collection("boards")
-        : null, {
-        snapshotListenOptions: { includeMetadataChanges: true },
-    })
-    const allBoards = origBoards.map(item => {
+        : null)
+    const allBoards = origBoards.docs.map(eachDoc => {
+        const data = eachDoc.data();
         return {
-            ...item,
-            createdOn: item.createdOn.seconds,
-            modifiedOn: item.createdOn.seconds,
-            wonAt: item.wonAt.seconds,
-            items: item.items.join("\n")
+            ...data,
+            id: eachDoc.id,
+            createdOn: data.createdOn ? data.createdOn.seconds : null,
+            modifiedOn: data.modifiedOn ? data.modifiedOn.seconds : null,
+            wonAt: data.wonAt ? data.wonAt.seconds : null,
+            items: data.items ? data.items.join("\n") : ""
         }
     })
-    console.log(allBoards)
     return { allBoards, loading, error }
+}
+
+hekaBackend.saveAdminBoard = async (boardData) => {
+    try {
+        const newDoc = await firestore.collection("boards").add({
+            title: boardData.title,
+            items: boardData.items,
+            isActive: boardData.isActive || false,
+            createdOn: firebase.firestore.FieldValue.serverTimestamp(),
+            modifiedOn: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        return newDoc
+    } catch (e) {
+        alert(e)
+        console.error(e)
+        return e
+    }
+}
+
+hekaBackend.updateAdminBoardActiveStatus = async (boardId, isActive) => {
+    try {
+        const updatedDoc = await firestore.collection("boards").doc(boardId).set({
+            isActive: isActive,
+            modifiedOn: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true })
+        return updatedDoc
+    } catch (e) {
+        alert(e)
+        console.error(e)
+        return e
+    }
+
 }
 
 export default hekaBackend;

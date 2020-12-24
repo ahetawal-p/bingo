@@ -4,7 +4,8 @@ const gridData = {}
 
 export const editableFields = [
     'title',
-    'items'
+    'items',
+    'isActive'
 ];
 
 export const readableFields = [
@@ -77,7 +78,6 @@ gridData.allColumns = [
         editComponent: props => (
             <TextField
                 fullWidth
-                size="medium"
                 multiline
                 rows={16}
                 required
@@ -98,11 +98,18 @@ gridData.allColumns = [
 
     },
     {
+        title: 'IsActive',
+        field: editableFields[2],
+        type: 'boolean'
+
+    },
+    {
         title: 'Create Date',
         field: readableFields[0], editable: 'never',
         type: 'datetime',
+        defaultSort: 'desc',
         render: rowData => {
-            return rowData ? new Date(rowData[readableFields[0]] * 1000).toLocaleString() : ""
+            return rowData && rowData[readableFields[0]] ? new Date(rowData[readableFields[0]] * 1000).toLocaleString() : ""
         }
     },
     {
@@ -120,7 +127,7 @@ gridData.allColumns = [
         field: readableFields[3], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return rowData ? new Date(rowData[readableFields[3]] * 1000).toLocaleString() : ""
+            return rowData && rowData[readableFields[3]] ? new Date(rowData[readableFields[3]] * 1000).toLocaleString() : ""
         }
 
     },
@@ -129,7 +136,7 @@ gridData.allColumns = [
         field: readableFields[4], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return rowData ? new Date(rowData[readableFields[4]] * 1000).toLocaleString() : ""
+            return rowData && rowData[readableFields[4]] ? new Date(rowData[readableFields[4]] * 1000).toLocaleString() : ""
         }
     },
 ]

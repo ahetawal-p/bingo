@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import LaunchScreen from "../LaunchScreen";
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import MaterialTable from 'material-table';
 import gridData from './GridData'
 import tableIcons from './tableIcons'
@@ -17,15 +17,54 @@ const useStyles = makeStyles((theme) => ({
 
 function AdminPage({ user, openSnackbar }) {
   const classes = useStyles();
+  const theme = useTheme();
   const { allBoards, loading, error } = hekaBackend.getAdminBoards(false)
 
-  const addNewEntry = () => {
-
+  const addNewEntry = async (newData) => {
+    const inValids = [];
+    const titleValue = newData.title
+    if (!titleValue || 0 === titleValue.length || !titleValue.trim()) {
+      inValids.push("Title is required")
+    }
+    const boardItems = newData.items
+    let cleanItems = []
+    if (!boardItems || 0 === boardItems.length || !boardItems.trim()) {
+      inValids.push("Items is required")
+    } else {
+      const allRawItems = boardItems.split("\n")
+      cleanItems = allRawItems.filter(eachItem => {
+        if (0 === eachItem.length || !eachItem.trim()) {
+          return false
+        }
+        return true
+      })
+      if (cleanItems.length !== 16) {
+        inValids.push("Not all board items configured == 16")
+      }
+    }
+    if (inValids.length > 0) {
+      alert('Invalid fields: \n' + inValids.join('\n'));
+      throw new Error('Invalid fields');
+    }
+    const toBeSavedBoard = {
+      title: newData.title,
+      items: cleanItems,
+      isActive: newData.isActive
+    }
+    const newDoc = await hekaBackend.saveAdminBoard(toBeSavedBoard)
+    return newDoc
   }
 
-  const editEntry = async () => {
-    alert('Not implemented');
-    throw new Error("not ")
+  const editEntry = async (newData, oldData) => {
+    const oldIsActive = oldData.isActive
+    const newIsActive = newData.isActive
+    if (oldIsActive !== newIsActive && oldData.title === newData.title && oldData.items === newData.items) {
+      const result = await hekaBackend.updateAdminBoardActiveStatus(newData.id, newData.isActive)
+      return result
+    } else {
+      alert("Only isActive status can be updated at this time")
+      throw new Error("Invalid actions")
+    }
   }
 
   useEffect(() => {
@@ -45,6 +84,7 @@ function AdminPage({ user, openSnackbar }) {
           style={{ marginBottom: 10 }}
           data={allBoards}
           options={{
+            tableLayout: 'fixed',
             paging: false,
             search: false,
             addRowPosition: 'first',
@@ -52,9 +92,9 @@ function AdminPage({ user, openSnackbar }) {
               padding: 10,
               whiteSpace: 'nowrap',
               textAlign: 'center',
-              backgroundColor: '#039be5'
+              backgroundColor: `${theme.palette.primary.main}`,
+              color: '#fff'
             }
-
           }}
           editable={{
             onRowAdd: addNewEntry,
