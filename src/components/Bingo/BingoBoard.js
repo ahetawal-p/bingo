@@ -11,15 +11,17 @@ import Confetti from 'react-confetti'
 import { useScreenshot } from 'use-react-screenshot'
 import hekaBackend from '../../services/hekaBackend'
 import SlackShare from './SlackShare'
-import util from '../../services/util'
+import EmptyState from "../EmptyState";
 import GameLostDialog from './GameLostDialog';
+import { ReactComponent as ErrorIllustration } from "../../illustrations/error.svg";
 
-// TODO add empty state when no current board present
+// TODO add empty state when no current board present - Done
 // Add calls to update every cell click - Done
 // Add transaction call for winner updates and error handling - Done
+// Add Admin view and create board logic - Done
+// Add lottie animation for: Loading, No board present, email verify(gif), each tile click
 // Fix sign up and sign in UX (Fix email to only salesforce)
 // Fix theme match to TH may be ?
-// Add Admin view and create board logic - Done
 // Remove unused views
 
 
@@ -47,7 +49,8 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         currentBoardTitle: null,
         userBoardItems: [],
         userBoardItemStatus: [],
-        isUserCompleted: false
+        isUserCompleted: false,
+        isNoBoardPresent: false
     });
     const { width, height } = useWindowSize()
     const [image, takeScreenshot] = useScreenshot()
@@ -87,7 +90,8 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                 userBoardItems: boardData.userBoardItems,
                 userBoardItemStatus: boardData.userBoardItemStatus,
                 isUserCompleted: boardData.isUserCompleted,
-                currentBoardTitle: boardData.currentBoardTitle
+                currentBoardTitle: boardData.currentBoardTitle,
+                isNoBoardPresent: boardData.isNoBoardPresent
             }))
         }
 
@@ -171,6 +175,11 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
             /> : null}
             {ready && (
                 <>
+                    {dbInfo.isNoBoardPresent && <EmptyState
+                        image={<ErrorIllustration />}
+                        title="Something went wrong"
+                        description="The app failed to load"
+                    />}
                     <SlackShare
                         open={openSlackShare}
                         user={user}

@@ -15,7 +15,8 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
         isUserCompleted: false,
         error: null,
         isReady: false,
-        isWon: false
+        isWon: false,
+        isNoBoardPresent: false
     });
 
     const [winnerInfo, setWinnerInfo] = useState({
@@ -34,7 +35,10 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
-    const [userDoc, , docError] = useDocument(!isMockData && currentBoard && currentBoard.docs[0].id ?
+    const [userDoc, , docError] = useDocument(!isMockData
+        && currentBoard
+        && currentBoard.docs.length > 0
+        && currentBoard.docs[0].id ?
         firestore.collection("users").doc(user.uid).collection("myboards").doc(currentBoard.docs[0].id) : null
     );
 
@@ -56,8 +60,13 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             const mockData = this.mockData()
             setDbInfo(mockData)
         }
-
-        if (currentBoard && currentBoard.docs[0].id && userDoc) {
+        if (currentBoard && currentBoard.docs.length === 0) {
+            setDbInfo(state => ({
+                ...state,
+                isNoBoardPresent: true,
+                isReady: true
+            }))
+        } else if (currentBoard && currentBoard.docs[0].id && userDoc) {
             const currentDocRef = currentBoard.docs[0]
             const currentDocData = currentDocRef.data()
             const docId = currentDocRef.id
