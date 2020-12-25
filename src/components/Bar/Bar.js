@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { Link as RouterLink } from "react-router-dom";
+import animationData from '../../illustrations/heka-loader.json'
+import Lottie from 'react-lottie';
 
 import {
   AppBar,
@@ -19,6 +21,12 @@ import {
 } from "@material-ui/core";
 
 import UserAvatar from "../UserAvatar";
+
+const defaultOptions = {
+  loop: true,
+  autoplay: true,
+  animationData
+};
 
 class Bar extends Component {
   constructor(props) {
@@ -94,7 +102,13 @@ class Bar extends Component {
     return (
       <AppBar color="primary" position="static">
         <Toolbar>
-          <Box display="flex" flexGrow={1}>
+          <Box display="flex" flexGrow={1} alignItems='center'>
+            <Lottie options={defaultOptions}
+              height={50}
+              width={50}
+              style={{ margin: 0 }}
+
+            />
             <Typography color="inherit" variant="h6">
               <Link
                 color="inherit"

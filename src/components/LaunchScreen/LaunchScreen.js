@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import { CircularProgress } from "@material-ui/core";
 import Lottie from 'react-lottie';
 import animationData from '../../illustrations/heka-loader.json'
 
