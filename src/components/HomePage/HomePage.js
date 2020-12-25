@@ -6,9 +6,8 @@ import { withRouter } from "react-router-dom";
 
 import EmptyState from "../EmptyState";
 import BingoBoard from "../Bingo"
-
-import { ReactComponent as CabinIllustration } from "../../illustrations/cabin.svg";
 import { ReactComponent as InsertBlockIllustration } from "../../illustrations/insert-block.svg";
+import animationData from '../../illustrations/email-verify-waiting.json'
 
 class HomePage extends Component {
 
@@ -22,9 +21,9 @@ class HomePage extends Component {
     } else if (user) {
       return (
         <EmptyState
-          image={<CabinIllustration />}
-          title="Home"
-          description="Verify email"
+          animationData={animationData}
+          title="Are you there ?"
+          description="Waiting for email verification"
         />
       );
     }

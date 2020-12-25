@@ -13,13 +13,13 @@ import hekaBackend from '../../services/hekaBackend'
 import SlackShare from './SlackShare'
 import EmptyState from "../EmptyState";
 import GameLostDialog from './GameLostDialog';
-import { ReactComponent as ErrorIllustration } from "../../illustrations/error.svg";
+import animationData from '../../illustrations/new-board-waiting.json'
 
 // TODO add empty state when no current board present - Done
 // Add calls to update every cell click - Done
 // Add transaction call for winner updates and error handling - Done
 // Add Admin view and create board logic - Done
-// Add lottie animation for: Loading, No board present, email verify(gif), each tile click
+// Add lottie animation for: Loading, No board present, email verify(gif), each tile click, winner, homepage
 // Fix sign up and sign in UX (Fix email to only salesforce)
 // Fix theme match to TH may be ?
 // Remove unused views
@@ -175,52 +175,57 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
             /> : null}
             {ready && (
                 <>
-                    {dbInfo.isNoBoardPresent && <EmptyState
-                        image={<ErrorIllustration />}
-                        title="Something went wrong"
-                        description="The app failed to load"
-                    />}
-                    <SlackShare
-                        open={openSlackShare}
-                        user={user}
-                        boardTitle={'Stay Healthy'}
-                        image={image}
-                        openSnackbar={openSnackbar}
-                        onClose={onCloseCallback} />
+                    {dbInfo.isNoBoardPresent ? <EmptyState
+                        animationData={animationData}
+                        lottieHeight={300}
+                        lottieWidth={300}
+                        title="Patience Is a Virtue"
+                        description="No new board available yet..."
+                    /> :
+                        <>
+                            <SlackShare
+                                open={openSlackShare}
+                                user={user}
+                                boardTitle={'Stay Healthy'}
+                                image={image}
+                                openSnackbar={openSnackbar}
+                                onClose={onCloseCallback} />
 
-                    <GameLostDialog
-                        open={openGameLost}
-                        handleClose={onCloseGameLostCallback}
-                        winnerName={winnerInfo.winnerName}
-                    />
+                            <GameLostDialog
+                                open={openGameLost}
+                                handleClose={onCloseGameLostCallback}
+                                winnerName={winnerInfo.winnerName}
+                            />
 
-                    <Box mx="auto" p={1} m={1}>
-                        <Typography variant="h5">{dbInfo.currentBoardTitle}</Typography>
-                        <Typography variant="body2" align="center">{state.readOnlyMessage}</Typography>
-                    </Box>
-                    <Grid container spacing={1}>
-                        {Object.keys(dbInfo.userBoardItems).map(id => {
-                            return <Grid item xs={3} key={id} style={{ display: 'flex' }}>
-                                {state.readOnly || dbInfo.isUserCompleted ?
-                                    <ReadOnlyTile
-                                        id={id}
-                                        isSet={!!dbInfo.userBoardItemStatus[id]}
-                                    >
-                                        {dbInfo.userBoardItems[id]}
-                                    </ReadOnlyTile>
-                                    :
-                                    <Tile
-                                        id={id}
-                                        isSet={!!dbInfo.userBoardItemStatus[id]}
-                                        onToggle={() => toggle(id)}
-                                        isChanging={id === currentChange}
-                                    >
-                                        {dbInfo.userBoardItems[id]}
-                                    </Tile>
-                                }
+                            <Box mx="auto" p={1} m={1}>
+                                <Typography variant="h5">{dbInfo.currentBoardTitle}</Typography>
+                                <Typography variant="body2" align="center">{state.readOnlyMessage}</Typography>
+                            </Box>
+                            <Grid container spacing={1}>
+                                {Object.keys(dbInfo.userBoardItems).map(id => {
+                                    return <Grid item xs={3} key={id} style={{ display: 'flex' }}>
+                                        {state.readOnly || dbInfo.isUserCompleted ?
+                                            <ReadOnlyTile
+                                                id={id}
+                                                isSet={!!dbInfo.userBoardItemStatus[id]}
+                                            >
+                                                {dbInfo.userBoardItems[id]}
+                                            </ReadOnlyTile>
+                                            :
+                                            <Tile
+                                                id={id}
+                                                isSet={!!dbInfo.userBoardItemStatus[id]}
+                                                onToggle={() => toggle(id)}
+                                                isChanging={id === currentChange}
+                                            >
+                                                {dbInfo.userBoardItems[id]}
+                                            </Tile>
+                                        }
+                                    </Grid>
+                                })}
                             </Grid>
-                        })}
-                    </Grid>
+                        </>
+                    }
                 </>
             )}
         </div>

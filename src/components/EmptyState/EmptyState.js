@@ -2,12 +2,22 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import { Box, Typography } from "@material-ui/core";
+import Lottie from 'react-lottie';
+
+const defaultOptions = {
+  loop: true,
+  autoplay: true,
+  rendererSettings: {
+    preserveAspectRatio: 'xMidYMid slice'
+  }
+};
 
 function EmptyState(props) {
   let imageWidth;
   let imageHeight;
   let variant;
 
+  defaultOptions['animationData'] = props.animationData
   switch (props.size) {
     case "small":
       imageWidth = 40;
@@ -51,6 +61,20 @@ function EmptyState(props) {
             height={`${imageHeight}%`}
           >
             {props.image}
+          </Box>
+        )}
+
+        {props.animationData && (
+          <Box
+            clone
+            mb={props.title || props.description ? 2 : 0}
+            width={`${imageWidth}%`}
+            height={`${imageHeight}%`}
+          >
+            <Lottie options={defaultOptions}
+              height={props.lottieHeight || 200}
+              width={props.lottieWidth || 200}
+            />
           </Box>
         )}
 
@@ -117,6 +141,7 @@ EmptyState.propTypes = {
   padding: PropTypes.number,
 
   image: PropTypes.element,
+  animationData: PropTypes.any,
   title: PropTypes.string,
   description: PropTypes.string,
   button: PropTypes.element,

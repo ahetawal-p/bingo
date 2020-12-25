@@ -1,10 +1,9 @@
 import React, { Component } from "react";
-
 import PropTypes from "prop-types";
-
 import { withStyles } from "@material-ui/core/styles";
-
 import { CircularProgress } from "@material-ui/core";
+import Lottie from 'react-lottie';
+import animationData from '../../illustrations/heka-loader.json'
 
 const styles = (theme) => ({
   center: {
@@ -16,6 +15,15 @@ const styles = (theme) => ({
   },
 });
 
+const defaultOptions = {
+  loop: true,
+  autoplay: true,
+  animationData,
+  rendererSettings: {
+    preserveAspectRatio: 'xMidYMid slice'
+  }
+};
+
 class LaunchScreen extends Component {
   render() {
     // Styling
@@ -23,7 +31,10 @@ class LaunchScreen extends Component {
 
     return (
       <div className={classes.center}>
-        <CircularProgress />
+        <Lottie options={defaultOptions}
+          height={200}
+          width={200}
+        />
       </div>
     );
   }
