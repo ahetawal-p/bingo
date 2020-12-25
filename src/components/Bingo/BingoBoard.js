@@ -15,11 +15,11 @@ import util from '../../services/util'
 import GameLostDialog from './GameLostDialog';
 
 // TODO add empty state when no current board present
-// Add calls to update every cell click
-// Add transaction call for winner updates and error handling
-// Fix sign up and sign in UX
+// Add calls to update every cell click - Done
+// Add transaction call for winner updates and error handling - Done
+// Fix sign up and sign in UX (Fix email to only salesforce)
 // Fix theme match to TH may be ?
-// Add Admin view and create board logic 
+// Add Admin view and create board logic - Done
 // Remove unused views
 
 
@@ -36,7 +36,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const classes = useStyles();
     const { boardData, winnerInfo } = hekaBackend.useBoardData(user, isMockData)
 
-    const [state, setState] = useState({ checked: {}, readOnly: false, readOnlyMessage: null });
+    const [state, setState] = useState({ readOnly: false, readOnlyMessage: null, won: false });
     const [currentChange, setCurrentChange] = useState("");
     const [ready, setReady] = useState(false);
     const [startScreenshot, setStartScreenshot] = useState(false);
@@ -64,7 +64,6 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
 
     useEffect(() => {
         if (image) {
-            console.log("I got image")
             setSlackShare(true)
         }
     }, [image])
@@ -72,17 +71,15 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     useEffect(() => {
         const getImage = () => takeScreenshot(getAppRef().current)
         if (startScreenshot === true && !image) {
-            console.log("I getting image")
             getImage()
         }
     }, [startScreenshot, takeScreenshot, getAppRef, image])
 
     useEffect(() => {
-        console.log("i am changing here")
         console.log(boardData)
         setReady(boardData.isReady)
         if (boardData.error) {
-            openSnackbar(boardData.error)
+            openSnackbar(boardData.error.message)
         } else if (boardData.isReady) {
             setDbInfo(state => ({
                 ...state,
@@ -97,15 +94,19 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     }, [boardData, openSnackbar]);
 
     useEffect(() => {
-        console.log("i am winner info")
         console.log(winnerInfo)
-        if (winnerInfo.isWon && winnerInfo.id !== user.uid) {
-            setOpenGameLost(true)
+        if (winnerInfo.isWon) {
+            let message = "Game over"
+            if (winnerInfo.winnerId === user.uid) {
+                message = "Congrats you nailed it !"
+            } else {
+                setOpenGameLost(true)
+            }
             setState(state => {
                 return {
                     ...state,
                     readOnly: true,
-                    readOnlyMessage: "Game over"
+                    readOnlyMessage: message
                 };
             });
         }
@@ -129,18 +130,21 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
             return
         }
         setCurrentChange(id)
-        await util.wait(50)
+        const checked = { ...dbInfo.userBoardItemStatus, [id]: !dbInfo.userBoardItemStatus[id] };
+        const won = isWon(checked);
+        await hekaBackend.saveUserAction(dbInfo.currentBoardId, checked, user)
         setCurrentChange("")
-        setState(state => {
-            const checked = { ...state.checked, [id]: !state.checked[id] };
-            const won = isWon(checked);
-            return {
-                ...state,
-                checked,
-                won
-            };
-        });
-
+        if (won) {
+            const result = await hekaBackend.updateWinner(dbInfo.currentBoardId, user)
+            if (result) {
+                setState(state => {
+                    return {
+                        ...state,
+                        won
+                    };
+                });
+            }
+        }
     }
 
     return (
@@ -191,14 +195,14 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                                 {state.readOnly || dbInfo.isUserCompleted ?
                                     <ReadOnlyTile
                                         id={id}
-                                        isSet={!!state.checked[id]}
+                                        isSet={!!dbInfo.userBoardItemStatus[id]}
                                     >
                                         {dbInfo.userBoardItems[id]}
                                     </ReadOnlyTile>
                                     :
                                     <Tile
                                         id={id}
-                                        isSet={!!state.checked[id]}
+                                        isSet={!!dbInfo.userBoardItemStatus[id]}
                                         onToggle={() => toggle(id)}
                                         isChanging={id === currentChange}
                                     >

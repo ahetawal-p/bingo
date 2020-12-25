@@ -8,14 +8,14 @@ const useStyles = makeStyles((theme) => ({
     tile: {
         border: "2px saddlebrown dashed",
         borderRadius: "8px",
-        display: 'flex',
-        width: '100%',
         [theme.breakpoints.down('sm')]: {
             height: '120px',
         },
         [theme.breakpoints.up('sm')]: {
             height: '100px',
         },
+        display: 'flex',
+        width: '100%',
         boxShadow: 'none',
         justifyContent: 'center',
         textAlign: 'center',
@@ -36,13 +36,18 @@ function ReadOnlyTile({ id, children, isSet }) {
         [classes.isSet]: isSet //only when isSet === true
     })
     return (
-        <Card className={style}>
-            <CardContent>
-                <Typography color="textSecondary">
-                    {children}
-                </Typography>
-            </CardContent>
-        </Card>
+        <div style={{
+            width: '100%',
+            height: '100%'
+        }}>
+            <Card className={style}>
+                <CardContent style={{ padding: '4px' }}>
+                    <Typography color="textSecondary">
+                        {children}
+                    </Typography>
+                </CardContent>
+            </Card>
+        </div>
 
     );
 }

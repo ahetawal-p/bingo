@@ -1,7 +1,7 @@
 import firebase, { firestore } from "../firebase";
 import { useState, useEffect } from 'react';
 import shuffle from "shuffle-array";
-import { useCollection, useDocumentOnce } from 'react-firebase-hooks/firestore';
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
 
 
 const hekaBackend = {};
@@ -19,20 +19,22 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
     });
 
     const [winnerInfo, setWinnerInfo] = useState({
-        winnerBoard: null,
-        winnerId: [],
+        winnerId: null,
         winnerName: [],
         wonAt: false,
         isWon: false
     });
 
     const [currentBoard, , boardError] = useCollection(!isMockData ?
-        firestore.collection("boards").where("isActive", "==", true).limit(1)
-        : null, {
-        snapshotListenOptions: { includeMetadataChanges: true },
-    }
+        firestore.collection("boards")
+            .where("isActive", "==", true)
+            .orderBy("modifiedOn", "desc")
+            .limit(1) : null,
+        {
+            snapshotListenOptions: { includeMetadataChanges: true },
+        }
     );
-    const [userDoc, , docError] = useDocumentOnce(!isMockData && currentBoard && currentBoard.docs[0].id ?
+    const [userDoc, , docError] = useDocument(!isMockData && currentBoard && currentBoard.docs[0].id ?
         firestore.collection("users").doc(user.uid).collection("myboards").doc(currentBoard.docs[0].id) : null
     );
 
@@ -64,7 +66,7 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             const isWon = currentDocData.isWon
             if (isWon) {
                 setWinnerInfo({
-                    winnerBoard: currentDocData.winnerBoard,
+                    winnerId: currentDocData.winnerId,
                     winnerName: currentDocData.winnerName,
                     wonAt: currentDocData.wonAt,
                     isWon: true
@@ -79,7 +81,7 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
                 console.log("I am present")
                 const currentData = userDoc.data()
                 actionSequence = currentData.actionSequence
-                isBoardCompleted = currentData.isCompleted
+                isBoardCompleted = currentData.isBoardCompleted
                 actionStatus = currentData.actionStatus
             } else {
                 console.log("I am NOT present")
@@ -201,7 +203,54 @@ hekaBackend.updateAdminBoardActiveStatus = async (boardId, isActive) => {
         console.error(e)
         return e
     }
+}
 
+hekaBackend.saveUserAction = async (currentBoardId, currentChoices, user) => {
+    try {
+        await firestore
+            .collection("users")
+            .doc(user.uid)
+            .collection("myboards")
+            .doc(currentBoardId)
+            .set({
+                actionStatus: currentChoices
+            }, { merge: true })
+    } catch (e) {
+        console.error(e)
+    }
+}
+
+hekaBackend.updateWinner = async (currentBoardId, user) => {
+    const mainBoardRef = firestore.collection('boards').doc(currentBoardId);
+    const userDocRef = firestore.collection("users")
+        .doc(user.uid)
+        .collection("myboards")
+        .doc(currentBoardId)
+    try {
+        const res = await firestore.runTransaction(async (t) => {
+            const doc = await t.get(mainBoardRef);
+            const isWonValue = doc.data().isWon;
+            if (!isWonValue) {
+                t.update(mainBoardRef, {
+                    isWon: true,
+                    winnerName: "I am",
+                    winnerId: user.uid,
+                    wonAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                t.update(userDocRef, {
+                    isBoardCompleted: true
+                })
+                return true;
+            } else {
+                throw new Error("Already a winner present");
+            }
+        });
+        console.log('Transaction success', res);
+        return res;
+    } catch (e) {
+        console.log('Transaction failure:', e);
+        return false
+    }
 }
 
 export default hekaBackend;
