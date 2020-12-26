@@ -6,7 +6,7 @@ import { withRouter } from "react-router-dom";
 
 import EmptyState from "../EmptyState";
 import BingoBoard from "../Bingo"
-import { ReactComponent as InsertBlockIllustration } from "../../illustrations/insert-block.svg";
+import homeAnimationData from '../../illustrations/home.json'
 import animationData from '../../illustrations/email-verify-waiting.json'
 
 class HomePage extends Component {
@@ -30,9 +30,12 @@ class HomePage extends Component {
 
     return (
       <EmptyState
-        image={<InsertBlockIllustration />}
+        animationData={homeAnimationData}
+        lottieHeight={300}
+        lottieWidth={300}
+        size="large"
         title="Heka"
-        description="Welcome to wellness bingo !"
+        description="Welcome to Wellness Bingo !"
       />
     );
   }

@@ -14,16 +14,23 @@ import SlackShare from './SlackShare'
 import EmptyState from "../EmptyState";
 import GameLostDialog from './GameLostDialog';
 import animationData from '../../illustrations/new-board-waiting.json'
+import winnerAnimationData from '../../illustrations/winner.json'
+import Lottie from 'react-lottie';
 
 // TODO add empty state when no current board present - Done
 // Add calls to update every cell click - Done
 // Add transaction call for winner updates and error handling - Done
 // Add Admin view and create board logic - Done
-// Add lottie animation for: Loading, No board present, email verify(gif), each tile click, winner, homepage
+// Add lottie animation for: Loading, No board present, email verify(gif), each tile click, winner, homepage - done
 // Fix sign up and sign in UX (Fix email to only salesforce)
 // Fix theme match to TH may be ?
 // Remove unused views
 
+const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: winnerAnimationData
+};
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,6 +38,17 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         padding: 8,
         flexDirection: 'column'
+    },
+    title: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: 4
+    },
+    winner: {
+        display: 'flex',
+        justifyContent: 'center',
+        padding: 4,
+        alignItems: 'center'
     }
 }));
 const isMockData = false
@@ -197,9 +215,17 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                                 winnerName={winnerInfo.winnerName}
                             />
 
-                            <Box mx="auto" p={1} m={1}>
-                                <Typography variant="h5">{dbInfo.currentBoardTitle}</Typography>
-                                <Typography variant="body2" align="center">{state.readOnlyMessage}</Typography>
+                            <Box className={classes.title}>
+                                <Typography variant="h4">{dbInfo.currentBoardTitle}</Typography>
+                            </Box>
+                            <Box className={classes.winner}>
+                                <Typography variant="body1">{state.readOnlyMessage}</Typography>
+                                <Lottie
+                                    options={defaultOptions}
+                                    height={40}
+                                    width={40}
+                                    style={{ margin: 0 }}
+                                />
                             </Box>
                             <Grid container spacing={1}>
                                 {Object.keys(dbInfo.userBoardItems).map(id => {
