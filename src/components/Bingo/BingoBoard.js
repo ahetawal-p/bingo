@@ -25,6 +25,7 @@ import Lottie from 'react-lottie';
 // Fix sign up and sign in UX (Fix email to only salesforce)
 // Fix theme match to TH may be ?
 // Remove unused views
+// Fix email to only salesforce
 
 const defaultOptions = {
     loop: true,

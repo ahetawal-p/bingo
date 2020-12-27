@@ -14,21 +14,14 @@ import {
   Typography,
   Tooltip,
   IconButton,
-  Hidden,
   Grid,
   Button,
-  Divider,
   TextField,
 } from "@material-ui/core";
 
 import { Close as CloseIcon } from "@material-ui/icons";
-
-import AuthProviderList from "../AuthProviderList";
-
 import constraints from "../../data/constraints";
 import authentication from "../../services/authentication";
-
-// validate.validators.email.PATTERN = /^((?!\.)[\w-_.]*[^.])(@salesforce\.com)$/
 
 const styles = (theme) => ({
   closeButton: {
@@ -53,9 +46,8 @@ const styles = (theme) => ({
 const initialState = {
   performingAction: false,
   emailAddress: "",
-  emailAddressConfirmation: "",
   password: "",
-  passwordConfirmation: "",
+  displayName: "",
   errors: null,
 };
 
@@ -69,23 +61,20 @@ class SignUpDialog extends Component {
   signUp = () => {
     const {
       emailAddress,
-      emailAddressConfirmation,
       password,
-      passwordConfirmation,
+      displayName,
     } = this.state;
 
     const errors = validate(
       {
         emailAddress: emailAddress,
-        emailAddressConfirmation: emailAddressConfirmation,
         password: password,
-        passwordConfirmation: passwordConfirmation,
+        displayName: displayName,
       },
       {
         emailAddress: constraints.emailAddress,
-        emailAddressConfirmation: constraints.emailAddressConfirmation,
         password: constraints.password,
-        passwordConfirmation: constraints.passwordConfirmation,
+        displayName: constraints.displayName
       }
     );
 
@@ -101,7 +90,7 @@ class SignUpDialog extends Component {
         },
         async () => {
           try {
-            await authentication.signUpWithEmailAddressAndPassword(emailAddress, password)
+            await authentication.signUpWithEmailAddressAndPassword(emailAddress, password, displayName)
 
             this.props.dialogProps.onClose();
 
@@ -129,68 +118,14 @@ class SignUpDialog extends Component {
     }
   };
 
-  signInWithAuthProvider = (provider) => {
-    this.setState(
-      {
-        performingAction: true,
-      },
-      () => {
-        authentication
-          .signInWithAuthProvider(provider)
-          .then((user) => {
-            this.props.dialogProps.onClose(() => {
-              const displayName = user.displayName;
-              const emailAddress = user.email;
-
-              this.props.openSnackbar(
-                `Signed in as ${displayName || emailAddress}`
-              );
-            });
-          })
-          .catch((reason) => {
-            const code = reason.code;
-            const message = reason.message;
-
-            switch (code) {
-              case "auth/account-exists-with-different-credential":
-              case "auth/auth-domain-config-required":
-              case "auth/cancelled-popup-request":
-              case "auth/operation-not-allowed":
-              case "auth/operation-not-supported-in-this-environment":
-              case "auth/popup-blocked":
-              case "auth/popup-closed-by-user":
-              case "auth/unauthorized-domain":
-                this.props.openSnackbar(message);
-                return;
-
-              default:
-                this.props.openSnackbar(message);
-                return;
-            }
-          })
-          .finally(() => {
-            this.setState({
-              performingAction: false,
-            });
-          });
-      }
-    );
-  };
-
   handleKeyPress = (event) => {
     const {
       emailAddress,
-      emailAddressConfirmation,
       password,
-      passwordConfirmation,
+      displayName
     } = this.state;
 
-    if (
-      !emailAddress ||
-      !emailAddressConfirmation ||
-      !password ||
-      !passwordConfirmation
-    ) {
+    if (!emailAddress || !password || !displayName) {
       return;
     }
 
@@ -217,14 +152,6 @@ class SignUpDialog extends Component {
     });
   };
 
-  handleEmailAddressConfirmationChange = (event) => {
-    const emailAddressConfirmation = event.target.value;
-
-    this.setState({
-      emailAddressConfirmation: emailAddressConfirmation,
-    });
-  };
-
   handlePasswordChange = (event) => {
     const password = event.target.value;
 
@@ -233,13 +160,14 @@ class SignUpDialog extends Component {
     });
   };
 
-  handlePasswordConfirmationChange = (event) => {
-    const passwordConfirmation = event.target.value;
+  handleDisplayNameChange = (event) => {
+    const displayName = event.target.value;
 
     this.setState({
-      passwordConfirmation: passwordConfirmation,
+      displayName: displayName,
     });
   };
+
 
   render() {
     // Styling
@@ -251,9 +179,8 @@ class SignUpDialog extends Component {
     const {
       performingAction,
       emailAddress,
-      emailAddressConfirmation,
       password,
-      passwordConfirmation,
+      displayName,
       errors,
     } = this.state;
 
@@ -281,217 +208,78 @@ class SignUpDialog extends Component {
           </Tooltip>
         </DialogTitle>
 
-        <Hidden xsDown>
-          <DialogContent>
-            <Grid container direction="row">
-              <Grid item xs={4}>
-                <AuthProviderList
-                  performingAction={performingAction}
-                  onAuthProviderClick={this.signInWithAuthProvider}
-                />
-              </Grid>
-
-              <Grid item xs={1}>
-                <Divider className={classes.divider} orientation="vertical" />
-              </Grid>
-
-              <Grid item xs={7}>
-                <Grid container direction="column" spacing={2}>
-                  <Grid item xs>
-                    <TextField
-                      autoComplete="email"
-                      disabled={performingAction}
-                      error={!!(errors && errors.emailAddress)}
-                      fullWidth
-                      helperText={
-                        errors && errors.emailAddress
-                          ? errors.emailAddress[0]
-                          : ""
-                      }
-                      label="E-mail address"
-                      placeholder="john@doe.com"
-                      required
-                      type="email"
-                      value={emailAddress}
-                      variant="outlined"
-                      InputLabelProps={{ required: false }}
-                      onChange={this.handleEmailAddressChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs>
-                    <TextField
-                      autoComplete="email"
-                      disabled={performingAction}
-                      error={!!(errors && errors.emailAddressConfirmation)}
-                      fullWidth
-                      helperText={
-                        errors && errors.emailAddressConfirmation
-                          ? errors.emailAddressConfirmation[0]
-                          : ""
-                      }
-                      label="E-mail address confirmation"
-                      placeholder="john@doe.com"
-                      required
-                      type="email"
-                      value={emailAddressConfirmation}
-                      variant="outlined"
-                      InputLabelProps={{ required: false }}
-                      onChange={this.handleEmailAddressConfirmationChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs>
-                    <TextField
-                      autoComplete="new-password"
-                      disabled={performingAction}
-                      error={!!(errors && errors.password)}
-                      fullWidth
-                      helperText={
-                        errors && errors.password ? errors.password[0] : ""
-                      }
-                      label="Password"
-                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                      required
-                      type="password"
-                      value={password}
-                      variant="outlined"
-                      InputLabelProps={{ required: false }}
-                      onChange={this.handlePasswordChange}
-                    />
-                  </Grid>
-
-                  <Grid item xs>
-                    <TextField
-                      autoComplete="password"
-                      disabled={performingAction}
-                      error={!!(errors && errors.passwordConfirmation)}
-                      fullWidth
-                      helperText={
-                        errors && errors.passwordConfirmation
-                          ? errors.passwordConfirmation[0]
-                          : ""
-                      }
-                      label="Password confirmation"
-                      placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                      required
-                      type="password"
-                      value={passwordConfirmation}
-                      variant="outlined"
-                      InputLabelProps={{ required: false }}
-                      onChange={this.handlePasswordConfirmationChange}
-                    />
-                  </Grid>
-                </Grid>
-              </Grid>
+        <DialogContent>
+          <Grid container direction="column" spacing={2}>
+            <Grid item xs>
+              <TextField
+                disabled={performingAction}
+                error={!!(errors && errors.displayName)}
+                fullWidth
+                helperText={
+                  errors && errors.displayName
+                    ? errors.displayName[0]
+                    : ""
+                }
+                label="Display Name"
+                placeholder="i.am.awesome"
+                required
+                value={displayName}
+                variant="outlined"
+                InputLabelProps={{ required: false }}
+                onChange={this.handleDisplayNameChange}
+              />
             </Grid>
-          </DialogContent>
-        </Hidden>
-
-        <Hidden smUp>
-          <DialogContent>
-            <AuthProviderList
-              gutterBottom
-              performingAction={performingAction}
-              onAuthProviderClick={this.signInWithAuthProvider}
-            />
-
-            <Grid container direction="column" spacing={2}>
-              <Grid item xs>
-                <TextField
-                  autoComplete="email"
-                  disabled={performingAction}
-                  error={!!(errors && errors.emailAddress)}
-                  fullWidth
-                  helperText={
-                    errors && errors.emailAddress ? errors.emailAddress[0] : ""
-                  }
-                  label="E-mail address"
-                  placeholder="john@doe.com"
-                  required
-                  type="email"
-                  value={emailAddress}
-                  variant="outlined"
-                  InputLabelProps={{ required: false }}
-                  onChange={this.handleEmailAddressChange}
-                />
-              </Grid>
-
-              <Grid item xs>
-                <TextField
-                  autoComplete="email"
-                  disabled={performingAction}
-                  error={!!(errors && errors.emailAddressConfirmation)}
-                  fullWidth
-                  helperText={
-                    errors && errors.emailAddressConfirmation
-                      ? errors.emailAddressConfirmation[0]
-                      : ""
-                  }
-                  label="E-mail address confirmation"
-                  placeholder="john@doe.com"
-                  required
-                  type="email"
-                  value={emailAddressConfirmation}
-                  variant="outlined"
-                  InputLabelProps={{ required: false }}
-                  onChange={this.handleEmailAddressConfirmationChange}
-                />
-              </Grid>
-
-              <Grid item xs>
-                <TextField
-                  autoComplete="new-password"
-                  disabled={performingAction}
-                  error={!!(errors && errors.password)}
-                  fullWidth
-                  helperText={
-                    errors && errors.password ? errors.password[0] : ""
-                  }
-                  label="Password"
-                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                  required
-                  type="password"
-                  value={password}
-                  variant="outlined"
-                  InputLabelProps={{ required: false }}
-                  onChange={this.handlePasswordChange}
-                />
-              </Grid>
-
-              <Grid item xs>
-                <TextField
-                  autoComplete="password"
-                  disabled={performingAction}
-                  error={!!(errors && errors.passwordConfirmation)}
-                  fullWidth
-                  helperText={
-                    errors && errors.passwordConfirmation
-                      ? errors.passwordConfirmation[0]
-                      : ""
-                  }
-                  label="Password confirmation"
-                  placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
-                  required
-                  type="password"
-                  value={passwordConfirmation}
-                  variant="outlined"
-                  InputLabelProps={{ required: false }}
-                  onChange={this.handlePasswordConfirmationChange}
-                />
-              </Grid>
+            <Grid item xs>
+              <TextField
+                autoComplete="email"
+                disabled={performingAction}
+                error={!!(errors && errors.emailAddress)}
+                fullWidth
+                helperText={
+                  errors && errors.emailAddress
+                    ? errors.emailAddress[0]
+                    : ""
+                }
+                label="E-mail address"
+                placeholder="john.doe@salesforce.com"
+                required
+                type="email"
+                value={emailAddress}
+                variant="outlined"
+                InputLabelProps={{ required: false }}
+                onChange={this.handleEmailAddressChange}
+              />
             </Grid>
-          </DialogContent>
-        </Hidden>
+
+            <Grid item xs>
+              <TextField
+                autoComplete="new-password"
+                disabled={performingAction}
+                error={!!(errors && errors.password)}
+                fullWidth
+                helperText={
+                  errors && errors.password ? errors.password[0] : ""
+                }
+                label="Password"
+                placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
+                required
+                type="password"
+                value={password}
+                variant="outlined"
+                InputLabelProps={{ required: false }}
+                onChange={this.handlePasswordChange}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
 
         <DialogActions>
           <Button
             color="primary"
             disabled={
               !emailAddress ||
-              !emailAddressConfirmation ||
               !password ||
-              !passwordConfirmation ||
+              !displayName ||
               performingAction
             }
             variant="contained"

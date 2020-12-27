@@ -3,9 +3,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { Link as RouterLink } from "react-router-dom";
-import animationData from '../../illustrations/heka-loader.json'
-import Lottie from 'react-lottie';
-
 import {
   AppBar,
   Toolbar,
@@ -21,12 +18,6 @@ import {
 } from "@material-ui/core";
 
 import UserAvatar from "../UserAvatar";
-
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData
-};
 
 class Bar extends Component {
   constructor(props) {
@@ -61,10 +52,14 @@ class Bar extends Component {
     // Properties
     const { performingAction, user, userData, roles } = this.props;
 
+    let cloneUser = Object.assign({}, user);
+    let newUser = JSON.parse(JSON.stringify(user));
+    cloneUser = Object.assign(newUser || {}, userData);
+
+
     // Events
     const {
       onAboutClick,
-      onSettingsClick,
       onSignOutClick,
       onSignUpClick,
       onSignInClick,
@@ -77,14 +72,14 @@ class Bar extends Component {
         name: "About",
         onClick: onAboutClick,
       },
-      {
-        name: "Profile",
-        to: user ? `/user/${user.uid}` : null,
-      },
-      {
-        name: "Settings",
-        onClick: onSettingsClick,
-      },
+      // {
+      //   name: "Profile",
+      //   to: user ? `/user/${user.uid}` : null,
+      // },
+      // {
+      //   name: "Settings",
+      //   onClick: onSettingsClick,
+      // },
       {
         name: "Sign out",
         divide: true,
@@ -103,12 +98,12 @@ class Bar extends Component {
       <AppBar color="primary" position="static">
         <Toolbar>
           <Box display="flex" flexGrow={1} alignItems='center'>
-            <Lottie options={defaultOptions}
+            {/* <Lottie options={defaultOptions}
               height={50}
               width={50}
               style={{ margin: 0 }}
 
-            />
+            /> */}
             <Typography color="inherit" variant="h6">
               <Link
                 color="inherit"
@@ -125,7 +120,7 @@ class Bar extends Component {
             <>
               <Box >
                 <Typography color="inherit" variant="body2" noWrap={true} align={'right'}>
-                  {`${roles.includes("admin") ? "*" : ''} Welcome ${user.email} !`}
+                  {`${roles.includes("admin") ? "*" : ''} Welcome ${cloneUser.displayName} !`}
                 </Typography>
               </Box>
               <IconButton
@@ -133,7 +128,7 @@ class Bar extends Component {
                 disabled={performingAction}
                 onClick={this.openMenu}
               >
-                <UserAvatar user={Object.assign(user, userData)} />
+                <UserAvatar user={cloneUser} />
               </IconButton>
 
               <Menu

@@ -376,7 +376,7 @@ class App extends Component {
                     props: {
                       title: "Sign out?",
                       contentText:
-                        "While signed out you are unable to manage your profile and conduct other activities that require you to be signed in.",
+                        "While signed out you will be unable to checkout new Hekas",
                       dismissiveAction: (
                         <Button
                           color="primary"

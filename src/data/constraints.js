@@ -1,3 +1,7 @@
+import validate from "validate.js";
+
+// validate.validators.email.PATTERN = /^((?!\.)[\w-_.]*[^.])(@salesforce\.com)$/
+
 const constraints = {
   firstName: {
     presence: {
@@ -15,9 +19,9 @@ const constraints = {
     type: "string",
   },
 
-  username: {
+  displayName: {
     length: {
-      minimum: 2,
+      minimum: 6,
       maximum: 20,
     },
 
@@ -30,7 +34,7 @@ const constraints = {
 
   emailAddress: {
     email: {
-      message: "^E-mail address is invalid"
+      message: "^E-mail address is invalid.\nOnly salesforce.com email address accepted."
     },
     presence: {
       allowEmpty: false,

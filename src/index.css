@@ -15,9 +15,9 @@ code {
 }
 
 /* play with this setting for mobile displays */
-@media only screen and (max-width: 550px)  {
+/* @media only screen and (max-width: 550px)  {
   #root {
     min-width: 500px;
   }
-}
+} */
 

@@ -7,10 +7,7 @@ import {
   DialogContent,
   Typography,
   Tooltip,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
+  IconButton
 } from "@material-ui/core";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -53,19 +50,9 @@ function AboutDialog(props) {
       </DialogTitle>
 
       <DialogContent>
-        <List disablePadding>
-          {version && (
-            <ListItem>
-              <ListItemText primary="Version" secondary={version} />
-            </ListItem>
-          )}
-
-          {user && (
-            <ListItem>
-              <ListItemText primary="UID" secondary={user.uid} />
-            </ListItem>
-          )}
-        </List>
+        <Typography variant="body1" paragraph>
+          {process.env.REACT_APP_TITLE} a new way to be healthy and have fun with your coworkers.
+        </Typography>
       </DialogContent>
     </Dialog>
   );

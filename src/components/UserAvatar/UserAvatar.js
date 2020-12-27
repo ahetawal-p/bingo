@@ -38,19 +38,19 @@ class UserAvatar extends Component {
         return <Avatar alt="Avatar" src={photoUrl} />;
       }
 
-      const nameInitials = authentication.getNameInitials({
-        ...user,
-      });
+      // const nameInitials = authentication.getNameInitials({
+      //   ...user,
+      // });
 
-      if (nameInitials) {
-        return (
-          <Avatar alt="Avatar">
-            <span className={defaultCursor && classes.nameInitials}>
-              {nameInitials}
-            </span>
-          </Avatar>
-        );
-      }
+      // if (nameInitials) {
+      //   return (
+      //     <Avatar alt="Avatar">
+      //       <span className={defaultCursor && classes.nameInitials}>
+      //         {nameInitials}
+      //       </span>
+      //     </Avatar>
+      //   );
+      // }
 
       return <AccountCircleIcon />;
     }

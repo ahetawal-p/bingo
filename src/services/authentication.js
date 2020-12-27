@@ -78,7 +78,7 @@ authentication.signUp = (fields) => {
   });
 };
 
-authentication.signUpWithEmailAddressAndPassword = async (emailAddress, password) => {
+authentication.signUpWithEmailAddressAndPassword = async (emailAddress, password, displayName) => {
   if (!emailAddress || !password) {
     throw new Error("No e-mail address or password");
   }
@@ -93,7 +93,7 @@ authentication.signUpWithEmailAddressAndPassword = async (emailAddress, password
   }
   const uid = user.uid
   const userDocumentReference = firestore.collection("users").doc(uid);
-  await userDocumentReference.set({}, { merge: true })
+  await userDocumentReference.set({ displayName: displayName }, { merge: true })
 
   await user.sendEmailVerification()
 
