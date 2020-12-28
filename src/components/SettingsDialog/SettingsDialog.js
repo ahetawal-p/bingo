@@ -22,12 +22,6 @@ import {
   Security as SecurityIcon,
 } from "@material-ui/icons";
 
-import SwipeableViews from "react-swipeable-views";
-
-import AccountTab from "../AccountTab";
-import AppearanceTab from "../AppearanceTab";
-import LinksTab from "../LinksTab";
-import SecurityTab from "../SecurityTab";
 
 const styles = (theme) => ({
   closeButton: {
@@ -101,14 +95,7 @@ class SettingsDialog extends Component {
     // Dialog Properties
     const { dialogProps } = this.props;
 
-    // Custom Properties
-    const { user, userData, theme } = this.props;
 
-    // Custom Functions
-    const { openSnackbar } = this.props;
-
-    // Custom Functions
-    const { onDeleteAccountClick } = this.props;
 
     const { selectedTab } = this.state;
 
@@ -141,27 +128,6 @@ class SettingsDialog extends Component {
           })}
         </Tabs>
 
-        <SwipeableViews
-          index={selectedTab}
-          onChangeIndex={this.handleIndexChange}
-        >
-          <AccountTab
-            user={user}
-            userData={userData}
-            openSnackbar={openSnackbar}
-            onDeleteAccountClick={onDeleteAccountClick}
-          />
-
-          <AppearanceTab theme={theme} openSnackbar={openSnackbar} />
-
-          <LinksTab theme={theme} openSnackbar={openSnackbar} />
-
-          <SecurityTab
-            user={user}
-            userData={userData}
-            openSnackbar={openSnackbar}
-          />
-        </SwipeableViews>
       </Dialog>
     );
   }

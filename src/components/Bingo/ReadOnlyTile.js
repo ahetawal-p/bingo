@@ -6,8 +6,7 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
     tile: {
-        border: "2px saddlebrown dashed",
-        borderRadius: "8px",
+        cursor: "pointer",
         [theme.breakpoints.down('sm')]: {
             height: '120px',
         },
@@ -16,7 +15,8 @@ const useStyles = makeStyles((theme) => ({
         },
         display: 'flex',
         width: '100%',
-        boxShadow: 'none',
+        boxShadow: ` 0 0 4px ${theme.palette.action.active}`,
+        backgroundColor: `${theme.palette.background.paper}`,
         justifyContent: 'center',
         textAlign: 'center',
         alignContent: 'center',
@@ -24,7 +24,9 @@ const useStyles = makeStyles((theme) => ({
 
     },
     isSet: {
-        backgroundColor: 'red',
+        cursor: "not-allowed",
+        boxShadow: `0 0 4px ${theme.palette.secondary.dark}`,
+        background: 'linear-gradient(45deg, #9575cd 50%, #00bfa5 90%)',
     }
 }));
 
@@ -42,7 +44,7 @@ function ReadOnlyTile({ id, children, isSet }) {
         }}>
             <Card className={style}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography color="textSecondary">
+                    <Typography variant="subtitle1">
                         {children}
                     </Typography>
                 </CardContent>

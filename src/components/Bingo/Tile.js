@@ -8,8 +8,6 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
     tile: {
-        border: "2px saddlebrown dashed",
-        borderRadius: "8px",
         cursor: "pointer",
         [theme.breakpoints.down('sm')]: {
             height: '120px',
@@ -19,7 +17,8 @@ const useStyles = makeStyles((theme) => ({
         },
         display: 'flex',
         width: '100%',
-        boxShadow: 'none',
+        boxShadow: ` 0 0 4px ${theme.palette.action.active}`,
+        backgroundColor: `${theme.palette.background.paper}`,
         justifyContent: 'center',
         textAlign: 'center',
         alignContent: 'center',
@@ -27,7 +26,8 @@ const useStyles = makeStyles((theme) => ({
     },
     completedTile: {
         cursor: "not-allowed",
-        backgroundColor: 'red'
+        boxShadow: `0 0 4px ${theme.palette.secondary.dark}`,
+        background: 'linear-gradient(45deg, #9575cd 50%, #00bfa5 90%)',
     }
 }));
 
@@ -48,7 +48,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
                     {isChanging && <CircularProgress size={16} />}
                     {!isChanging && (
                         <>
-                            <Typography color="textSecondary">
+                            <Typography variant="subtitle1" >
                                 {children}
                             </Typography>
                         </>
@@ -57,7 +57,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
             </Card>
             <Card className={completedStyle}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography color="textSecondary">
+                    <Typography color="subtitle1">
                         {children}
                     </Typography>
                 </CardContent>

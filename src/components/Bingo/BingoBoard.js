@@ -15,23 +15,18 @@ import EmptyState from "../EmptyState";
 import GameLostDialog from './GameLostDialog';
 import animationData from '../../illustrations/new-board-waiting.json'
 import winnerAnimationData from '../../illustrations/winner.json'
-import Lottie from 'react-lottie';
+import Lottie from 'react-lottie-player';
 
 // TODO add empty state when no current board present - Done
 // Add calls to update every cell click - Done
 // Add transaction call for winner updates and error handling - Done
 // Add Admin view and create board logic - Done
 // Add lottie animation for: Loading, No board present, email verify(gif), each tile click, winner, homepage - done
-// Fix sign up and sign in UX (Fix email to only salesforce)
+// Fix sign up and sign in UX - Done
 // Fix theme match to TH may be ?
 // Remove unused views
 // Fix email to only salesforce
 
-const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: winnerAnimationData
-};
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -219,16 +214,18 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                             <Box className={classes.title}>
                                 <Typography variant="h4">{dbInfo.currentBoardTitle}</Typography>
                             </Box>
-                            <Box className={classes.winner}>
-                                <Typography variant="body1">{state.readOnlyMessage}</Typography>
-                                <Lottie
-                                    options={defaultOptions}
-                                    height={40}
-                                    width={40}
-                                    style={{ margin: 0 }}
-                                />
-                            </Box>
-                            <Grid container spacing={1}>
+                            {winnerInfo.isWon && (
+                                <Box className={classes.winner}>
+                                    <Typography variant="body1">{state.readOnlyMessage}</Typography>
+                                    <Lottie
+                                        play
+                                        loop
+                                        animationData={winnerAnimationData}
+                                        style={{ margin: 0, width: 40, height: 40 }}
+                                    />
+                                </Box>)
+                            }
+                            <Grid container spacing={2}>
                                 {Object.keys(dbInfo.userBoardItems).map(id => {
                                     return <Grid item xs={3} key={id} style={{ display: 'flex' }}>
                                         {state.readOnly || dbInfo.isUserCompleted ?

@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
-import Lottie from 'react-lottie';
+
 import animationData from '../../illustrations/heka-loader.json'
+import Lottie from 'react-lottie-player';
 
 const styles = (theme) => ({
   center: {
@@ -14,15 +15,6 @@ const styles = (theme) => ({
   },
 });
 
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData,
-  rendererSettings: {
-    preserveAspectRatio: 'xMidYMid slice'
-  }
-};
-
 class LaunchScreen extends Component {
   render() {
     // Styling
@@ -30,9 +22,11 @@ class LaunchScreen extends Component {
 
     return (
       <div className={classes.center}>
-        <Lottie options={defaultOptions}
-          height={200}
-          width={200}
+        <Lottie
+          loop
+          play
+          animationData={animationData}
+          style={{ width: 200, height: 200 }}
         />
       </div>
     );
