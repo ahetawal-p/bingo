@@ -12,10 +12,17 @@ import NotFoundPage from "../NotFoundPage";
 class Router extends Component {
   render() {
     // Properties
-    const { user, roles, bar, getAppRef } = this.props;
+    const { user, roles, bar, getAppRef, userData } = this.props;
 
     // Functions
     const { openSnackbar } = this.props;
+
+    let cloneUser = null
+    if (user) {
+      cloneUser = Object.assign({}, user);
+      let newUser = JSON.parse(JSON.stringify(user));
+      cloneUser = Object.assign(newUser || {}, userData);
+    }
 
     return (
       <BrowserRouter basename={process.env.REACT_APP_BASENAME}>
@@ -23,19 +30,19 @@ class Router extends Component {
 
         <Switch>
           <Route path="/" exact>
-            <HomePage user={user} openSnackbar={openSnackbar} getAppRef={getAppRef} />
+            <HomePage user={cloneUser} openSnackbar={openSnackbar} getAppRef={getAppRef} />
           </Route>
 
           <Route path="/admin">
-            {user && roles.includes("admin") ? (
-              <AdminPage openSnackbar={openSnackbar} user={user} />
+            {cloneUser && roles.includes("admin") ? (
+              <AdminPage openSnackbar={openSnackbar} user={cloneUser} />
             ) : (
                 <Redirect to="/" />
               )}
           </Route>
 
           <Route path="/user/:userId">
-            {user ? <UserPage /> : <Redirect to="/" />}
+            {cloneUser ? <UserPage /> : <Redirect to="/" />}
           </Route>
 
           <Route>
@@ -52,6 +59,7 @@ Router.propTypes = {
   user: PropTypes.object,
   roles: PropTypes.array.isRequired,
   bar: PropTypes.element,
+  userData: PropTypes.object,
 
   // Functions
   openSnackbar: PropTypes.func.isRequired,

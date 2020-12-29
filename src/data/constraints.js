@@ -1,6 +1,6 @@
 import validate from "validate.js";
 
-// validate.validators.email.PATTERN = /^((?!\.)[\w-_.]*[^.])(@salesforce\.com)$/
+validate.validators.email.PATTERN = /^((?!\.)[\w-_.]*[^.])(@salesforce\.com)$/
 
 const constraints = {
   firstName: {
@@ -21,8 +21,8 @@ const constraints = {
 
   displayName: {
     length: {
-      minimum: 6,
-      maximum: 20,
+      minimum: 4,
+      maximum: 12,
     },
 
     presence: {

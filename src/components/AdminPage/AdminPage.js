@@ -58,7 +58,10 @@ function AdminPage({ user, openSnackbar }) {
   const editEntry = async (newData, oldData) => {
     const oldIsActive = oldData.isActive
     const newIsActive = newData.isActive
-    if (oldIsActive !== newIsActive && oldData.title === newData.title && oldData.items === newData.items) {
+    if (oldIsActive !== newIsActive
+      && oldData.winnerId
+      && oldData.title === newData.title
+      && oldData.items === newData.items) {
       const result = await hekaBackend.updateAdminBoardActiveStatus(newData.id, newData.isActive)
       return result
     } else {

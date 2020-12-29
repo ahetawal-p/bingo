@@ -27,6 +27,7 @@ import Lottie from 'react-lottie-player';
 // Remove unused views
 // Fix email to only salesforce
 
+const winnerMessage = 'Congrats you nailed it !'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -70,12 +71,10 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const [image, takeScreenshot] = useScreenshot()
 
     const onCloseCallback = () => {
-        console.log("Closing now")
         setSlackShare(false)
     }
 
     const onCloseGameLostCallback = () => {
-        console.log("Closing now")
         setOpenGameLost(false)
     }
 
@@ -93,7 +92,6 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     }, [startScreenshot, takeScreenshot, getAppRef, image])
 
     useEffect(() => {
-        console.log(boardData)
         setReady(boardData.isReady)
         if (boardData.error) {
             openSnackbar(boardData.error.message)
@@ -112,11 +110,10 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     }, [boardData, openSnackbar]);
 
     useEffect(() => {
-        console.log(winnerInfo)
         if (winnerInfo.isWon) {
             let message = "Game over"
             if (winnerInfo.winnerId === user.uid) {
-                message = "Congrats you nailed it !"
+                message = winnerMessage
             } else {
                 setOpenGameLost(true)
             }
@@ -181,7 +178,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                             ...state,
                             won: false,
                             readOnly: true,
-                            readOnlyMessage: "Congrats you nailed it !"
+                            readOnlyMessage: winnerMessage
                         };
                     });
                     setStartScreenshot(true)

@@ -36,14 +36,16 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
     const classes = useStyles();
     const completedStyle = clsx({
         [classes.tile]: true,
-        [classes.completedTile]: true
+        [classes.completedTile]: isSet ? true : false,
+        'hvr-pulse-grow': !isSet ? true : false,
+
     })
     return (
         <ReactCardFlip isFlipped={isSet} flipDirection="vertical" containerStyle={{
             width: '100%',
             height: '100%',
         }}>
-            <Card onClick={onToggle} className={classes.tile}>
+            <Card onClick={onToggle} className={completedStyle}>
                 <CardContent style={{ padding: '4px' }}>
                     {isChanging && <CircularProgress size={16} />}
                     {!isChanging && (
@@ -57,7 +59,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
             </Card>
             <Card className={completedStyle}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography color="subtitle1">
+                    <Typography variant="subtitle1">
                         {children}
                     </Typography>
                 </CardContent>

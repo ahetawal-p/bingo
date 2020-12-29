@@ -6,7 +6,7 @@ import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
     tile: {
-        cursor: "pointer",
+        cursor: "not-allowed",
         [theme.breakpoints.down('sm')]: {
             height: '120px',
         },
@@ -15,12 +15,14 @@ const useStyles = makeStyles((theme) => ({
         },
         display: 'flex',
         width: '100%',
+        border: `1px ${theme.palette.action.active} solid`,
         boxShadow: ` 0 0 4px ${theme.palette.action.active}`,
         backgroundColor: `${theme.palette.background.paper}`,
         justifyContent: 'center',
         textAlign: 'center',
         alignContent: 'center',
-        flexDirection: 'column', alignItems: 'center'
+        flexDirection: 'column',
+        alignItems: 'center'
 
     },
     isSet: {

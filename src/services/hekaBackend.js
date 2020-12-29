@@ -87,13 +87,11 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
                 }))
             }
             if (userDoc.exists) {
-                console.log("I am present")
                 const currentData = userDoc.data()
                 actionSequence = currentData.actionSequence
                 isBoardCompleted = currentData.isBoardCompleted
                 actionStatus = currentData.actionStatus
             } else {
-                console.log("I am NOT present")
                 actionSequence = shuffle(activeItems, { copy: true }).map(val => (
                     activeItems.findIndex(origValue => origValue === val)
                 ));
@@ -254,10 +252,9 @@ hekaBackend.updateWinner = async (currentBoardId, user) => {
                 throw new Error("Already a winner present");
             }
         });
-        console.log('Transaction success', res);
         return res;
     } catch (e) {
-        console.log('Transaction failure:', e);
+        console.error('Transaction failure:', e);
         return false
     }
 }

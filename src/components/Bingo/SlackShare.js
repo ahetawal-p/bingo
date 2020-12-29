@@ -38,7 +38,7 @@ export default function SlackShare({ open, image, user, boardTitle, openSnackbar
         setValue(event.target.value);
     };
 
-    const placeholder = `Share your glory on Slack #Heka ${user.uid}`
+    const placeholder = `Share your glory on Slack #Heka ${user.displayName}`
     return (
         <Dialog
             open={open}
@@ -80,6 +80,7 @@ export default function SlackShare({ open, image, user, boardTitle, openSnackbar
                     color="primary"
                     variant="contained"
                     onClick={shareIt}
+                    className={"hvr-wobble-skew"}
                     startIcon={<SlackIcon />}
                 >
                     Share

@@ -279,6 +279,7 @@ class App extends Component {
             <div ref={this.appRef} id='appContainer'>
               <Router
                 user={user}
+                userData={userData}
                 roles={roles}
                 getAppRef={this.getAppRef}
                 bar={
