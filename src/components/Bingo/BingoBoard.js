@@ -16,16 +16,9 @@ import GameLostDialog from './GameLostDialog';
 import animationData from '../../illustrations/new-board-waiting.json'
 import winnerAnimationData from '../../illustrations/winner.json'
 import Lottie from 'react-lottie-player';
+// eslint-disable-next-line no-unused-vars
+import util from '../../services/util'
 
-// TODO add empty state when no current board present - Done
-// Add calls to update every cell click - Done
-// Add transaction call for winner updates and error handling - Done
-// Add Admin view and create board logic - Done
-// Add lottie animation for: Loading, No board present, email verify(gif), each tile click, winner, homepage - done
-// Fix sign up and sign in UX - Done
-// Fix theme match to TH may be ?
-// Remove unused views
-// Fix email to only salesforce
 
 const winnerMessage = 'Congrats you nailed it !'
 
@@ -34,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         display: 'flex',
         padding: 8,
-        flexDirection: 'column'
+        flexDirection: 'column',
+        backgroundColor: `${theme.palette.background.paper}`
     },
     title: {
         display: 'flex',
@@ -58,6 +52,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const [ready, setReady] = useState(false);
     const [startScreenshot, setStartScreenshot] = useState(false);
     const [openSlackShare, setSlackShare] = useState(false);
+    const [confettiComplete, setConfettiComplete] = useState(false);
     const [openGameLost, setOpenGameLost] = useState(false);
     const [dbInfo, setDbInfo] = useState({
         currentBoardId: null,
@@ -71,7 +66,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     const [image, takeScreenshot] = useScreenshot()
 
     const onCloseCallback = () => {
-        setSlackShare(false)
+        //  setSlackShare(false)
     }
 
     const onCloseGameLostCallback = () => {
@@ -79,10 +74,17 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
     }
 
     useEffect(() => {
-        if (image) {
-            setSlackShare(true)
+        async function uploadWinnerBoard(currentBoardId, image) {
+            const result = await hekaBackend.uploadWinnerBoard(currentBoardId, image)
+            if (result) {
+                openSnackbar("Published winner board !")
+            }
         }
-    }, [image])
+        if (image) {
+            // setSlackShare(true)
+            uploadWinnerBoard(dbInfo.currentBoardId, image)
+        }
+    }, [dbInfo.currentBoardId, image, openSnackbar])
 
     useEffect(() => {
         const getImage = () => takeScreenshot(getAppRef().current)
@@ -126,6 +128,20 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
             });
         }
     }, [winnerInfo, openSnackbar, user.uid])
+
+    useEffect(() => {
+        if (confettiComplete) {
+            setState(state => {
+                return {
+                    ...state,
+                    won: false,
+                    readOnly: true,
+                    readOnlyMessage: winnerMessage
+                };
+            });
+            setStartScreenshot(true)
+        }
+    }, [confettiComplete])
 
     const isWon = checked => {
         const range = [0, 1, 2, 3];
@@ -171,17 +187,8 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                 recycle={false}
                 numberOfPieces={500}
                 onConfettiComplete={confetti => {
-                    console.log("i am done");
                     confetti.reset()
-                    setState(state => {
-                        return {
-                            ...state,
-                            won: false,
-                            readOnly: true,
-                            readOnlyMessage: winnerMessage
-                        };
-                    });
-                    setStartScreenshot(true)
+                    setConfettiComplete(true)
                 }}
             /> : null}
             {ready && (
@@ -206,6 +213,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                                 open={openGameLost}
                                 handleClose={onCloseGameLostCallback}
                                 winnerName={winnerInfo.winnerName}
+                                winnerBoardUrl={winnerInfo.winnerBoardUrl}
                             />
 
                             <Box className={classes.title}>

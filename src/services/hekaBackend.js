@@ -1,4 +1,4 @@
-import firebase, { firestore } from "../firebase";
+import firebase, { firestore, storage } from "../firebase";
 import { useState, useEffect } from 'react';
 import shuffle from "shuffle-array";
 import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
@@ -23,7 +23,8 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
         winnerId: null,
         winnerName: [],
         wonAt: false,
-        isWon: false
+        isWon: false,
+        winnerBoardUrl: null
     });
 
     const [currentBoard, , boardError] = useCollection(!isMockData ?
@@ -73,12 +74,14 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             const activeItems = currentDocData.items
             const title = currentDocData.title
             const isWon = currentDocData.isWon
+            const winnerBoardUrl = currentDocData.winnerBoardUrl
             if (isWon) {
                 setWinnerInfo({
                     winnerId: currentDocData.winnerId,
                     winnerName: currentDocData.winnerName,
                     wonAt: currentDocData.wonAt,
-                    isWon: true
+                    isWon: true,
+                    winnerBoardUrl: winnerBoardUrl
                 })
             } else {
                 setWinnerInfo(state => ({
@@ -241,7 +244,7 @@ hekaBackend.updateWinner = async (currentBoardId, user) => {
             if (!isWonValue) {
                 t.update(mainBoardRef, {
                     isWon: true,
-                    winnerName: "I am",
+                    winnerName: user.displayName,
                     winnerId: user.uid,
                     wonAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -260,4 +263,28 @@ hekaBackend.updateWinner = async (currentBoardId, user) => {
     }
 }
 
+hekaBackend.uploadWinnerBoard = async (currentBoardId, base64Image) => {
+    const avatarReference = storage
+        .ref()
+        .child("images")
+        .child("boards")
+        .child(currentBoardId);
+    try {
+        const newFileRes = await fetch(base64Image)
+        const blob = await newFileRes.blob()
+        await avatarReference.put(blob)
+        const downloadUrl = await avatarReference.getDownloadURL()
+        const mainBoardRef = firestore.collection('boards').doc(currentBoardId);
+        await mainBoardRef.set({
+            winnerBoardUrl: downloadUrl
+        }, { merge: true })
+        return true
+    } catch (e) {
+        console.error('upload failed:', e);
+        return false
+    }
+
+
+
+}
 export default hekaBackend;
