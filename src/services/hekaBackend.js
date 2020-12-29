@@ -198,9 +198,10 @@ hekaBackend.saveAdminBoard = async (boardData) => {
     }
 }
 
-hekaBackend.updateAdminBoardActiveStatus = async (boardId, isActive) => {
+hekaBackend.updateAdminBoardActiveStatus = async (boardId, isActive, items) => {
     try {
         const updatedDoc = await firestore.collection("boards").doc(boardId).set({
+            items: items,
             isActive: isActive,
             modifiedOn: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true })
