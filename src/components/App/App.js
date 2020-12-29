@@ -381,7 +381,7 @@ class App extends Component {
                         "While signed out you will be unable to checkout new Hekas",
                       dismissiveAction: (
                         <Button
-                          color="primary"
+                          color="secondary"
                           onClick={() => this.closeDialog("signOutDialog")}
                         >
                           Cancel

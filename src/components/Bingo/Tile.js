@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
     tile: {
         cursor: "pointer",
         [theme.breakpoints.down('sm')]: {
-            height: '120px',
+            height: '140px',
         },
         [theme.breakpoints.up('sm')]: {
             height: '100px',
@@ -50,7 +50,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
                     {isChanging && <CircularProgress size={16} />}
                     {!isChanging && (
                         <>
-                            <Typography variant="subtitle1" >
+                            <Typography variant="body2" >
                                 {children}
                             </Typography>
                         </>
@@ -59,7 +59,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
             </Card>
             <Card className={completedStyle}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography variant="subtitle1">
+                    <Typography variant="body2">
                         {children}
                     </Typography>
                 </CardContent>

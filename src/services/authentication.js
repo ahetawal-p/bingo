@@ -95,7 +95,12 @@ authentication.signUpWithEmailAddressAndPassword = async (emailAddress, password
   const userDocumentReference = firestore.collection("users").doc(uid);
   await userDocumentReference.set({ displayName: displayName }, { merge: true })
 
-  await user.sendEmailVerification()
+  const actionCodeSettings = {
+    url: process.env.REACT_APP_HOMEPAGE,
+    handleCodeInApp: true,
+  };
+
+  await user.sendEmailVerification(actionCodeSettings)
 
 };
 

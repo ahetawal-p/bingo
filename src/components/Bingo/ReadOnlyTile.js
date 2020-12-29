@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
     tile: {
         cursor: "not-allowed",
         [theme.breakpoints.down('sm')]: {
-            height: '120px',
+            height: '140px',
         },
         [theme.breakpoints.up('sm')]: {
             height: '100px',
@@ -46,7 +46,7 @@ function ReadOnlyTile({ id, children, isSet }) {
         }}>
             <Card className={style}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography variant="subtitle1">
+                    <Typography variant="body2">
                         {children}
                     </Typography>
                 </CardContent>
