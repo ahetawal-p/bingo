@@ -1,6 +1,6 @@
 {
-  "short_name": "RMUIF",
-  "name": "RMUIF",
+  "short_name": "Heka",
+  "name": "Heka",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,6 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#2196f3",
+  "theme_color": "#673ab7",
   "background_color": "#ffffff"
 }

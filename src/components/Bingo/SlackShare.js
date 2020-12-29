@@ -12,6 +12,7 @@ import {
     CircularProgress,
 } from "@material-ui/core";
 import slack from '../../services/slack'
+// eslint-disable-next-line no-unused-vars
 import util from '../../services/util'
 
 
@@ -21,8 +22,8 @@ export default function SlackShare({ open, image, user, boardTitle, openSnackbar
     const shareIt = async () => {
         try {
             setPosting(true)
-            await util.wait(1050)
-            // await slack.share(user, image, boardTitle, value || "Check this out...")
+            // await util.wait(1050)
+            await slack.share(user, image, boardTitle, value || "Check this out...")
             openSnackbar("Shared Successfully")
         } catch (e) {
             console.error(e)
