@@ -162,7 +162,7 @@ const defaultTheme = createMuiTheme({
   palette: {
     primary: defaultPrimaryColor.import,
     secondary: defaultSecondaryColor.import,
-    type: defaultDark ? "dark" : "light",
+    // type: defaultDark ? "dark" : "light",
   },
 
   primaryColor: defaultPrimaryColor,
@@ -205,16 +205,16 @@ appearance.createTheme = (theme) => {
   let secondaryColor = theme.secondaryColor;
   let dark = theme.dark;
 
-  if (!primaryColor || !secondaryColor) {
-    return null;
-  }
+  // if (!primaryColor || !secondaryColor) {
+  //   return null;
+  // }
 
-  primaryColor = getColor(primaryColor);
-  secondaryColor = getColor(secondaryColor);
+  // primaryColor = getColor(primaryColor);
+  // secondaryColor = getColor(secondaryColor);
 
-  if (!primaryColor || !secondaryColor) {
-    return null;
-  }
+  // if (!primaryColor || !secondaryColor) {
+  //   return null;
+  // }
 
   theme = createMuiTheme({
     palette: {

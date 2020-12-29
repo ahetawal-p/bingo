@@ -15,6 +15,7 @@ import LaunchScreen from "../LaunchScreen";
 import Bar from "../Bar";
 import Router from "../Router";
 import DialogHost from "../DialogHost";
+import withMediaQuery from './mediaquery'
 
 const initialState = {
   ready: false,
@@ -414,6 +415,18 @@ class App extends Component {
     );
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    const { isDarkMode } = this.props;
+    const { theme } = this.state;
+    if (isDarkMode && !theme.dark) {
+      let orgTheme = Object.assign({}, theme);
+      let newTheme = JSON.parse(JSON.stringify(orgTheme));
+      newTheme.dark = isDarkMode
+      this.setTheme(newTheme)
+    }
+  }
+
+
   componentDidMount() {
     this.onAuthStateChangedObserver = auth.onAuthStateChanged(
       (user) => {
@@ -496,4 +509,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default (withMediaQuery('(prefers-color-scheme: dark)')(App));
