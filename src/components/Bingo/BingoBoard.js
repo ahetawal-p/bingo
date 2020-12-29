@@ -217,7 +217,7 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                             />
 
                             <Box className={classes.title}>
-                                <Typography variant="h4">{dbInfo.currentBoardTitle}</Typography>
+                                <Typography variant="h4" paragraph>{dbInfo.currentBoardTitle}</Typography>
                             </Box>
                             {winnerInfo.isWon && winnerInfo.winnerId === user.uid && (
                                 <Box className={classes.winner}>
