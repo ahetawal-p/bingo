@@ -16,6 +16,8 @@ import GameLostDialog from './GameLostDialog';
 import animationData from '../../illustrations/new-board-waiting.json'
 import winnerAnimationData from '../../illustrations/winner.json'
 import Lottie from 'react-lottie-player';
+import Button from '@material-ui/core/Button';
+import SaveIcon from '@material-ui/icons/Save';
 // eslint-disable-next-line no-unused-vars
 import util from '../../services/util'
 
@@ -40,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         padding: 4,
         alignItems: 'center'
+    },
+    button: {
+        margin: theme.spacing(1),
     }
 }));
 const isMockData = false
@@ -178,6 +183,20 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         }
     }
 
+    const handleSaveClick = async () => {
+        const newFileRes = await fetch(winnerInfo.winnerBoardUrl)
+        const blob = await newFileRes.blob()
+        const url = window.URL.createObjectURL(new Blob([blob], { type: 'image/png' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${dbInfo.currentBoardTitle}.png`);
+        // 3. Append to html page
+        document.body.appendChild(link);
+        // 4. Force download
+        link.click();
+        // 5. Clean up and remove the link
+        link.parentNode.removeChild(link);
+    }
     return (
         <div className={classes.root}>
             {!ready && <LaunchScreen />}
@@ -228,6 +247,14 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                                         animationData={winnerAnimationData}
                                         style={{ margin: 0, width: 40, height: 40 }}
                                     />
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        size="small"
+                                        className={classes.button}
+                                        onClick={handleSaveClick}
+                                        startIcon={<SaveIcon />}
+                                    >Save</Button>
                                 </Box>)
                             }
                             <Grid container spacing={2}>
