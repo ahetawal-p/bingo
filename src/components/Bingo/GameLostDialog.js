@@ -21,7 +21,7 @@ export default function GameLostDialog({ open, handleClose, winnerName, winnerBo
                         </Grid>
                         <Grid item xs>
                             <img
-                                style={{ width: '100%', height: '50%', boxShadow: '0 0 8px' }}
+                                style={{ width: '100%', height: '100%', boxShadow: '0 0 8px' }}
                                 src={winnerBoardUrl}
                                 alt="winner" />
                         </Grid>
