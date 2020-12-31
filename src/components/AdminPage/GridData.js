@@ -12,6 +12,7 @@ export const readableFields = [
     'createdOn',
     'isWon',
     'winnerName',
+    'winnerBoardUrl',
     'wonAt',
     'modifiedOn'
 ];
@@ -123,20 +124,28 @@ gridData.allColumns = [
 
     },
     {
-        title: 'Won At',
+        title: 'Winner Board Url',
         field: readableFields[3], editable: 'never',
+        render: rowData => (
+            // eslint-disable-next-line react/jsx-no-target-blank
+            <a href={rowData[readableFields[3]]} style={{ color: '#009688' }} target="_blank">Winner Board</a>
+        )
+    },
+    {
+        title: 'Won At',
+        field: readableFields[4], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return rowData && rowData[readableFields[3]] ? new Date(rowData[readableFields[3]] * 1000).toLocaleString() : ""
+            return rowData && rowData[readableFields[4]] ? new Date(rowData[readableFields[4]] * 1000).toLocaleString() : ""
         }
 
     },
     {
         title: 'Modified On',
-        field: readableFields[4], editable: 'never',
+        field: readableFields[5], editable: 'never',
         type: 'datetime',
         render: rowData => {
-            return rowData && rowData[readableFields[4]] ? new Date(rowData[readableFields[4]] * 1000).toLocaleString() : ""
+            return rowData && rowData[readableFields[5]] ? new Date(rowData[readableFields[5]] * 1000).toLocaleString() : ""
         }
     },
 ]
