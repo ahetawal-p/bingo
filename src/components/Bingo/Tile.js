@@ -5,6 +5,8 @@ import { CircularProgress } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme) => ({
     tile: {
@@ -34,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
 
 function Tile({ id, children, onToggle, isSet, isChanging }) {
     const classes = useStyles();
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up('sm'));
+    const fontVariant = isDesktop ? 'subtitle1' : 'body2'
     const completedStyle = clsx({
         [classes.tile]: true,
         [classes.completedTile]: isSet ? true : false,
@@ -50,7 +55,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
                     {isChanging && <CircularProgress size={16} />}
                     {!isChanging && (
                         <>
-                            <Typography variant="body2" >
+                            <Typography variant={fontVariant} >
                                 {children}
                             </Typography>
                         </>
@@ -59,7 +64,7 @@ function Tile({ id, children, onToggle, isSet, isChanging }) {
             </Card>
             <Card className={completedStyle}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography variant="body2">
+                    <Typography variant={fontVariant}>
                         {children}
                     </Typography>
                 </CardContent>

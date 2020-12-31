@@ -3,6 +3,8 @@ import CardContent from "@material-ui/core/CardContent";
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const useStyles = makeStyles((theme) => ({
     tile: {
@@ -34,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
 
 
 function ReadOnlyTile({ id, children, isSet }) {
+    const theme = useTheme();
+    const isDesktop = useMediaQuery(theme.breakpoints.up('sm'));
+    const fontVariant = isDesktop ? 'subtitle1' : 'body2'
     const classes = useStyles();
     const style = clsx({
         [classes.tile]: true, //always applies
@@ -46,7 +51,7 @@ function ReadOnlyTile({ id, children, isSet }) {
         }}>
             <Card className={style}>
                 <CardContent style={{ padding: '4px' }}>
-                    <Typography variant="body2">
+                    <Typography variant={fontVariant}>
                         {children}
                     </Typography>
                 </CardContent>
