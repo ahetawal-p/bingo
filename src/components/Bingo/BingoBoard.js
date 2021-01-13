@@ -15,6 +15,7 @@ import EmptyState from "../EmptyState";
 import GameLostDialog from './GameLostDialog';
 import animationData from '../../illustrations/new-board-waiting.json'
 import winnerAnimationData from '../../illustrations/winner.json'
+import timerAnimation from '../../illustrations/timer.json'
 import Lottie from 'react-lottie-player';
 import Button from '@material-ui/core/Button';
 import SaveIcon from '@material-ui/icons/Save';
@@ -41,7 +42,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         justifyContent: 'center',
         padding: 4,
-        alignItems: 'center'
+        alignItems: 'center',
+        marginBottom: 4
     },
     button: {
         margin: theme.spacing(1),
@@ -65,7 +67,9 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
         userBoardItems: [],
         userBoardItemStatus: [],
         isUserCompleted: false,
-        isNoBoardPresent: false
+        isNoBoardPresent: false,
+        timeLimitExpired: true,
+        nextPlayDate: ""
     });
     const { width, height } = useWindowSize()
     const [image, takeScreenshot] = useScreenshot()
@@ -110,7 +114,9 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                 userBoardItemStatus: boardData.userBoardItemStatus,
                 isUserCompleted: boardData.isUserCompleted,
                 currentBoardTitle: boardData.currentBoardTitle,
-                isNoBoardPresent: boardData.isNoBoardPresent
+                isNoBoardPresent: boardData.isNoBoardPresent,
+                timeLimitExpired: boardData.timeLimitExpired,
+                nextPlayDate: boardData.nextPlayDate
             }))
         }
 
@@ -257,10 +263,21 @@ export default function CenteredGrid({ user, openSnackbar, getAppRef }) {
                                     >Save</Button>
                                 </Box>)
                             }
+                            {!winnerInfo.isWon && !dbInfo.timeLimitExpired && dbInfo.nextPlayDate && (
+                                <Box className={classes.winner} fontStyle="italic">
+                                    <Typography variant="subtitle2">{"Next turn after: " + dbInfo.nextPlayDate}</Typography>
+                                    <Lottie
+                                        play
+                                        loop
+                                        animationData={timerAnimation}
+                                        style={{ margin: 0, width: 30, height: 30 }}
+                                    />
+                                </Box>)
+                            }
                             <Grid container spacing={2}>
                                 {Object.keys(dbInfo.userBoardItems).map(id => {
                                     return <Grid item xs={3} key={id} style={{ display: 'flex' }}>
-                                        {state.readOnly || dbInfo.isUserCompleted ?
+                                        {state.readOnly || dbInfo.isUserCompleted || !dbInfo.timeLimitExpired ?
                                             <ReadOnlyTile
                                                 id={id}
                                                 isSet={!!dbInfo.userBoardItemStatus[id]}

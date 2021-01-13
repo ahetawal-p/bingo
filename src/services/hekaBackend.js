@@ -16,7 +16,9 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
         error: null,
         isReady: false,
         isWon: false,
-        isNoBoardPresent: false
+        isNoBoardPresent: false,
+        timeLimitExpired: true,
+        nextPlayDate: ""
     });
 
     const [winnerInfo, setWinnerInfo] = useState({
@@ -75,6 +77,8 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             const title = currentDocData.title
             const isWon = currentDocData.isWon
             const winnerBoardUrl = currentDocData.winnerBoardUrl
+            let timeLimitExpired = true
+            let nextPlayDate = new Date()
             if (isWon) {
                 setWinnerInfo({
                     winnerId: currentDocData.winnerId,
@@ -91,6 +95,13 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
             }
             if (userDoc.exists) {
                 const currentData = userDoc.data()
+                if (currentData.lastModifiedOn) {
+                    const lastMilli = currentData.lastModifiedOn.toMillis()
+                    nextPlayDate = new Date(lastMilli + 60 * 60 * 24 * 1000);
+                    const now = new Date()
+                    var diffInHour = Math.floor((nextPlayDate - now) / (1000 * 60 * 60));
+                    timeLimitExpired = diffInHour > 0 ? false : true
+                }
                 actionSequence = currentData.actionSequence
                 isBoardCompleted = currentData.isBoardCompleted
                 actionStatus = currentData.actionStatus
@@ -98,7 +109,6 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
                 actionSequence = shuffle(activeItems, { copy: true }).map(val => (
                     activeItems.findIndex(origValue => origValue === val)
                 ));
-
                 actionStatus = new Array(16).fill(false)
                 updateUserDoc(docId)
             }
@@ -113,7 +123,9 @@ hekaBackend.useBoardData = function useBoardData(user, isMockData) {
                 userBoardItemStatus: actionStatus,
                 isUserCompleted: isBoardCompleted,
                 isError: null,
-                isReady: true
+                isReady: true,
+                timeLimitExpired: timeLimitExpired,
+                nextPlayDate: nextPlayDate.toLocaleString()
             })
         }
         if (boardError || docError) {
@@ -223,8 +235,9 @@ hekaBackend.saveUserAction = async (currentBoardId, currentChoices, user) => {
             .doc(user.uid)
             .collection("myboards")
             .doc(currentBoardId)
-            .set({
-                actionStatus: currentChoices
+            .update({
+                actionStatus: currentChoices,
+                lastModifiedOn: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true })
     } catch (e) {
         console.error(e)
