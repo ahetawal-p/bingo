@@ -1,1 +1,1 @@
-Worksplace Health bingo, based on React, MaterialUI and Firebase
+Worksplace Health bingo based on React, MaterialUI and Firebase
